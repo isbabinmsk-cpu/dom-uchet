@@ -838,3 +838,593 @@ input:focus, select:focus {
 .tariff-form-section .tariff-form {
     margin-bottom: var(--ios-spacing-lg);
 }
+
+/* ===== СЕКЦИЯ ОПЛАТЫ ===== */
+.payment-section {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 12px;
+    padding: var(--ios-spacing-md);
+}
+
+.payment-icon {
+    color: var(--ios-success) !important;
+}
+
+.payment-type-selector {
+    display: flex;
+    gap: 8px;
+    margin-bottom: var(--ios-spacing-md);
+}
+
+.payment-type-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 12px;
+    border: 2px solid var(--ios-border);
+    border-radius: 10px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.payment-type-btn ion-icon {
+    font-size: 20px;
+}
+
+.payment-type-btn.active {
+    border-color: var(--ios-success);
+    background: rgba(52, 199, 89, 0.1);
+    color: var(--ios-success);
+}
+
+.payment-form {
+    display: none;
+}
+
+.payment-form.active {
+    display: block;}
+
+/* ===== БАЛАНС ===== */
+.balance-display {
+    background: white;
+    border-radius: 10px;
+    padding: var(--ios-spacing-md);
+    margin-top: var(--ios-spacing-md);
+}
+
+.balance-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--ios-border);
+    font-size: 15px;
+}
+
+.balance-item:last-child {
+    border-bottom: none;
+}
+
+.balance-label {
+    color: var(--ios-text-secondary);
+}
+
+.balance-total {
+    font-size: 18px;
+    padding-top: 12px;
+    margin-top: 4px;
+    border-top: 2px solid var(--ios-border);
+}
+
+.balance-total .balance-label {
+    font-weight: 700;
+    color: var(--ios-text-primary);
+}
+
+.balance-total strong {
+    color: var(--ios-accent);
+}
+
+.balance-total.debt strong {
+    color: var(--ios-danger);
+}
+
+.balance-total.overpayment strong {
+    color: var(--ios-success);
+}
+/* ===== ВКЛАДКА ОПЛАТЫ ===== */
+.balance-summary {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--ios-spacing-md);
+    margin-bottom: var(--ios-spacing-lg);
+}
+
+.balance-card {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: var(--ios-spacing-md);
+    border-left: 4px solid var(--ios-accent);
+}
+
+.balance-card.electricity {
+    border-left-color: var(--ios-warning);
+}
+
+.balance-card.gas {
+    border-left-color: var(--ios-warning);
+}
+
+.balance-card-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--ios-border);
+}
+
+.balance-card-header ion-icon {
+    font-size: 22px;
+    color: var(--ios-warning);
+}
+
+.balance-card-values {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.balance-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+}
+.balance-row span {
+    color: var(--ios-text-secondary);
+}
+
+.balance-row strong {
+    font-weight: 600;
+}
+
+.balance-result {
+    padding-top: 8px;
+    margin-top: 4px;
+    border-top: 2px solid var(--ios-border);
+    font-size: 16px;
+}
+
+.balance-result strong {
+    color: var(--ios-accent);
+}
+
+.balance-result.debt strong {
+    color: var(--ios-danger);
+}
+
+.balance-result.overpayment strong {
+    color: var(--ios-success);
+}
+
+/* ===== СПИСОК ОПЛАТ ===== */
+.payments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.payment-item {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: var(--ios-spacing-md);
+    border-left: 4px solid var(--ios-success);
+    transition: all 0.2s;
+}
+
+.payment-item:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.payment-item.electricity {
+    border-left-color: var(--ios-warning);
+}
+.payment-item.gas {
+    border-left-color: var(--ios-warning);
+}
+
+.payment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.payment-date {
+    font-weight: 700;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.payment-type {
+    font-size: 12px;
+    color: var(--ios-text-tertiary);
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.payment-amount {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--ios-success);
+    margin-bottom: 8px;
+}
+
+.payment-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.payment-actions button {
+    flex: 1;
+    padding: 10px;
+    font-size: 14px;
+}
+
+/* Адаптивность */
+@media (max-width: 600px) {
+    .balance-summary {
+        grid-template-columns: 1fr;    }
+    
+    .payment-type-selector {
+        flex-direction: column;
+    }
+}
+
+.btn-primary {
+    background: var(--ios-accent);
+    color: white;
+}
+
+/* ===== ПЛАВАЮЩЕЕ ПЕРЕТАСКИВАЕМОЕ МЕНЮ ===== */
+.floating-nav {
+    position: fixed;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: var(--ios-blur);
+    -webkit-backdrop-filter: var(--ios-blur);
+    border-radius: 24px;
+    padding: 8px 12px;
+    display: flex;
+    gap: 4px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), 0 2px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    max-width: 95vw;
+    overflow-x: auto;
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+    transition: box-shadow 0.3s, transform 0.1s;
+    /* Начальная позиция - будет установлена через JS */
+    left: 50%;
+    bottom: 20px;
+    transform: translateX(-50%);
+}
+
+.floating-nav.dragging {
+    cursor: grabbing;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25), 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateX(-50%) scale(1.05);
+    z-index: 1001;
+}
+
+.floating-nav.dragging .nav-btn {
+    pointer-events: none;
+}
+
+/* Индикатор перетаскивания */
+.floating-nav::before {
+    content: '⠿';
+    position: absolute;
+    top: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 14px;
+    color: var(--ios-text-tertiary);
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.nav-btn {    background: none;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 10px 16px;
+    cursor: pointer;
+    color: var(--ios-text-tertiary);
+    transition: all 0.3s;
+    border-radius: 16px;
+    min-width: 60px;
+    font-family: inherit;
+    pointer-events: auto;
+}
+
+.nav-btn ion-icon {
+    font-size: 24px;
+    transition: all 0.3s;
+}
+
+.nav-btn span {
+    font-size: 11px;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.nav-btn.active {
+    background: var(--ios-accent);
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+}
+
+.nav-btn.active ion-icon {
+    transform: scale(1.1);
+}
+
+/* Адаптивность */
+@media (max-width: 600px) {
+    .floating-nav {
+        padding: 6px 8px;
+        gap: 2px;
+    }
+    
+    .nav-btn {
+        padding: 8px 12px;
+        min-width: 50px;
+    }
+    
+    .nav-btn ion-icon {        font-size: 20px;
+    }
+    
+    .nav-btn span {
+        font-size: 10px;
+    }
+}
+
+@media (max-width: 360px) {
+    .nav-btn {
+        padding: 6px 10px;
+        min-width: 45px;
+    }
+}
+
+/* ===== МОДАЛЬНОЕ ОКНО РЕДАКТИРОВАНИЯ ===== */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: fadeIn 0.2s ease;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal-content {
+    background: var(--ios-card);
+    border-radius: 16px;
+    width: 100%;
+    max-width: 500px;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--ios-border);    position: sticky;
+    top: 0;
+    background: var(--ios-card);
+    border-radius: 16px 16px 0 0;
+    z-index: 1;
+}
+
+.modal-header h3 {
+    font-size: 20px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+}
+
+.modal-header h3 ion-icon {
+    font-size: 24px;
+    color: var(--ios-accent);
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.modal-close ion-icon {
+    font-size: 24px;
+    color: var(--ios-text-secondary);
+}
+
+.modal-close:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.modal-body {
+    padding: 24px;
+}
+
+.modal-body .form-group {
+    margin-bottom: 16px;
+}
+.modal-body .form-group label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ios-text-secondary);
+    margin-bottom: 8px;
+}
+
+.modal-body .form-group label ion-icon {
+    font-size: 20px;
+}
+
+.modal-body input,
+.modal-body select {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1.5px solid var(--ios-border);
+    border-radius: 10px;
+    font-size: 16px;
+    background: var(--ios-bg);
+    transition: all 0.2s;
+    font-family: inherit;
+}
+
+.modal-body input:focus {
+    outline: none;
+    border-color: var(--ios-accent);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+}
+
+.modal-body .form-row {
+    margin-bottom: 16px;
+}
+
+.modal-body .form-row.two-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.modal-body .calc-results {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 14px;
+    margin-top: 12px;
+}
+
+.modal-body .calc-item {    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--ios-border);
+    font-size: 14px;
+}
+
+.modal-body .calc-item:last-child {
+    border-bottom: none;
+}
+
+.modal-body .calc-item.total {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ios-accent);
+}
+
+.modal-footer {
+    display: flex;
+    gap: 12px;
+    padding: 16px 24px;
+    border-top: 1px solid var(--ios-border);
+    position: sticky;
+    bottom: 0;
+    background: var(--ios-card);
+    border-radius: 0 0 16px 16px;
+}
+
+.modal-footer .btn {
+    flex: 1;
+    justify-content: center;
+}
+
+/* Адаптивность модального окна */
+@media (max-width: 480px) {
+    .modal-overlay {
+        padding: 10px;
+        align-items: flex-end;
+    }
+    
+    .modal-content {
+        max-height: 90vh;
+        border-radius: 16px 16px 0 0;
+        animation: slideUpMobile 0.3s ease;
+    }
+    
+    @keyframes slideUpMobile {
+        from {
+            opacity: 0;
+            transform: translateY(100%);        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .modal-header {
+        padding: 16px 20px;
+    }
+    
+    .modal-body {
+        padding: 20px;
+    }
+    
+    .modal-footer {
+        padding: 12px 20px;
+    }
+    
+    .modal-body .form-row.two-columns {
+        grid-template-columns: 1fr;
+    }
+}
