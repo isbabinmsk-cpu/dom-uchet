@@ -786,3 +786,55 @@ input:focus, select:focus {
         font-size: 15px;
     }
 }
+
+/* ===== ПЕРЕКЛЮЧАТЕЛЬ ТИПА ТАРИФА ===== */
+.tariff-type-selector {
+    display: flex;
+    gap: 10px;
+    margin-bottom: var(--ios-spacing-lg);
+}
+
+.tariff-type-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px;
+    border: 2px solid var(--ios-border);
+    border-radius: 12px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.tariff-type-btn ion-icon {
+    font-size: 22px;
+}
+
+.tariff-type-btn.active {
+    border-color: var(--ios-accent);
+    background: rgba(0, 122, 255, 0.1);
+    color: var(--ios-accent);
+}
+
+.tariff-type-btn:hover:not(.active) {
+    border-color: var(--ios-accent);
+    background: rgba(0, 122, 255, 0.05);
+}
+
+/* Секции форм тарифов */
+.tariff-form-section {
+    display: none;
+}
+
+.tariff-form-section.active {
+    display: block;
+}
+
+.tariff-form-section .tariff-form {
+    margin-bottom: var(--ios-spacing-lg);
+}
