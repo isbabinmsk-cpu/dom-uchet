@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Учет коммунальных платежей - электричество, газ, соль, картридж">
+    <meta name="theme-color" content="#007AFF">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Дом Учет">
+    <title>Учет коммунальных платежей</title>
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path fill='%23007AFF' d='M256 32C114.6 32 0 125.1 0 240c0 49.6 21.4 95 57 130.7C44.5 421.1 2.7 466 2.2 466.5a8 8 0 0 0 5.8 13.5h192.2a8 8 0 0 0 7.8-6c17.4-69.4 79.5-120 153.5-120h1.5c79.5 0 144-53.7 144-120C512 125.1 397.4 32 256 32z'/></svg>">
+    
+    <link rel="stylesheet" href="style.css">
+    
+    <script type="module" src="https://unpkg.com/ionicons@7.4.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.4.0/dist/ionicons/ionicons.js"></script>
+    
+    <script type="module" src="firebase-config.js"></script>
+    <script type="module" src="script.js"></script>
+</head>
+<body>
+    <header class="top-header">
+        <h1>
+            <ion-icon name="home-outline" class="header-icon"></ion-icon>
+            Учет коммунальных платежей
+        </h1>
+    </header>
+
+    <main class="container">
+        <!-- Вкладка: Ввод -->
+<div id="tab-input" class="tab-content active">
+    <div class="card">
+        <h2>
+            <ion-icon name="add-circle-outline" class="section-icon"></ion-icon>
+            Ввод показаний
+        </h2>
+        
+        <!-- Переключатель типа записи -->
+        <div class="type-selector">
+            <button class="type-btn active" onclick="showInputType('electricity', this)">
+                <ion-icon name="flash-outline"></ion-icon>
+                <span>Электроэнергия</span>
+            </button>
+            <button class="type-btn" onclick="showInputType('gas', this)">
+                <ion-icon name="flame-outline"></ion-icon>
+                <span>Газ</span>
+            </button>
+            <button class="type-btn" onclick="showInputType('salt', this)">
+                <ion-icon name="snow-outline"></ion-icon>
+                <span>Соль</span>
+            </button>
+            <button class="type-btn" onclick="showInputType('cartridge', this)">
+                <ion-icon name="filter-outline"></ion-icon>
+                <span>Картридж</span>
+            </button>
+        </div>
+        
+        <!-- Форма: Электроэнергия -->
+        <div id="input-electricity" class="input-form active">
+            <div class="form-section">
+                <h3>
+                    <ion-icon name="flash-outline" class="form-icon electricity-icon"></ion-icon>
+                    Электроэнергия
+                </h3>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>
+                            <ion-icon name="calendar-outline" class="form-icon"></ion-icon>
+                            Дата *
+                        </label>
+                        <input type="date" id="elec-date" required>
+                    </div>
+                </div>
+                
+                <div class="form-row two-columns">
+                    <div class="form-group">
+                        <label>
+                            <ion-icon name="sunny-outline" class="form-icon t1-icon"></ion-icon>                            Т1 (день) *
+                        </label>
+                        <input type="number" id="elec-t1" step="0.01" min="0" required oninput="autoCalcElectric()">
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <ion-icon name="moon-outline" class="form-icon t2-icon"></ion-icon>
+                            Т2 (ночь) *
+                        </label>
+                        <input type="number" id="elec-t2" step="0.01" min="0" required oninput="autoCalcElectric()">
+                    </div>
+                </div>
+                
+                <div class="calc-results">
+                    <div class="calc-item">
+                        <span>Расход Т1:</span>
+                        <strong id="elec-t1-consumption">0 кВт·ч</strong>
+                    </div>
+                    <div class="calc-item">
+                        <span>Расход Т2:</span>
+                        <strong id="elec-t2-consumption">0 кВт·ч</strong>
+                    </div>
+                    <div class="calc-item total">
+                        <span>Стоимость:</span>
+                        <strong id="elec-total">0 ₽</strong>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button type="button" class="btn btn-success" onclick="saveRecord('electricity')">
+                    <ion-icon name="save-outline" class="btn-icon"></ion-icon>
+                    Сохранить
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="clearForm('electricity')">
+                    <ion-icon name="trash-outline" class="btn-icon"></ion-icon>
+                    Очистить
+                </button>
+            </div>
+        </div>
+        
+        <!-- Форма: Газ -->
+        <div id="input-gas" class="input-form">
+            <div class="form-section">
+                <h3>
+                    <ion-icon name="flame-outline" class="form-icon gas-icon"></ion-icon>
+                    Газ
+                </h3>
+                
+                <div class="form-row">                    <div class="form-group">
+                        <label>
+                            <ion-icon name="calendar-outline" class="form-icon"></ion-icon>
+                            Дата *
+                        </label>
+                        <input type="date" id="gas-date" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>
+                            <ion-icon name="speedometer-outline" class="form-icon"></ion-icon>
+                            Показание (м³) *
+                        </label>
+                        <input type="number" id="gas-reading" step="0.01" min="0" required oninput="autoCalcGas()">
+                    </div>
+                </div>
+                
+                <div class="calc-results">
+                    <div class="calc-item">
+                        <span>Расход:</span>
+                        <strong id="gas-consumption">0 м³</strong>
+                    </div>
+                    <div class="calc-item total">
+                        <span>Стоимость:</span>
+                        <strong id="gas-total">0 ₽</strong>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button type="button" class="btn btn-success" onclick="saveRecord('gas')">
+                    <ion-icon name="save-outline" class="btn-icon"></ion-icon>
+                    Сохранить
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="clearForm('gas')">
+                    <ion-icon name="trash-outline" class="btn-icon"></ion-icon>
+                    Очистить
+                </button>
+            </div>
+        </div>
+        
+        <!-- Форма: Соль -->
+        <div id="input-salt" class="input-form">
+            <div class="form-section">
+                <h3>
+                    <ion-icon name="snow-outline" class="form-icon salt-icon"></ion-icon>
+                    Засыпка соли
+                </h3>                
+                <div class="form-row two-columns">
+                    <div class="form-group">
+                        <label>
+                            <ion-icon name="calendar-outline" class="form-icon"></ion-icon>
+                            Дата *
+                        </label>
+                        <input type="date" id="salt-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <ion-icon name="scale-outline" class="form-icon"></ion-icon>
+                            Количество (кг) *
+                        </label>
+                        <input type="number" id="salt-kg" step="0.1" min="0" value="25" required>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button type="button" class="btn btn-success" onclick="saveRecord('salt')">
+                    <ion-icon name="save-outline" class="btn-icon"></ion-icon>
+                    Сохранить
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="clearForm('salt')">
+                    <ion-icon name="trash-outline" class="btn-icon"></ion-icon>
+                    Очистить
+                </button>
+            </div>
+        </div>
+        
+        <!-- Форма: Картридж -->
+        <div id="input-cartridge" class="input-form">
+            <div class="form-section">
+                <h3>
+                    <ion-icon name="filter-outline" class="form-icon filter-icon"></ion-icon>
+                    Замена картриджа
+                </h3>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>
+                            <ion-icon name="calendar-outline" class="form-icon"></ion-icon>
+                            Дата *
+                        </label>
+                        <input type="date" id="cartridge-date" required>
+                    </div>
+                </div>
+            </div>
+                        <div class="form-actions">
+                <button type="button" class="btn btn-success" onclick="saveRecord('cartridge')">
+                    <ion-icon name="save-outline" class="btn-icon"></ion-icon>
+                    Сохранить
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="clearForm('cartridge')">
+                    <ion-icon name="trash-outline" class="btn-icon"></ion-icon>
+                    Очистить
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+        <!-- Вкладка: Аналитика -->
+        <div id="tab-analytics" class="tab-content">
+            <div class="card">
+                <h2>
+                    <ion-icon name="stats-chart-outline" class="section-icon"></ion-icon>
+                    Аналитика расходов
+                </h2>
+                
+                <div class="period-selector">
+                    <div class="form-group">
+                        <label>Месяц</label>
+                        <select id="analytics-month" onchange="updateAnalytics()">
+                            <option value="">Все месяцы</option>
+                        </select>
+                    </div>
+                    <div class="form-group">                        <label>Год</label>
+                        <select id="analytics-year" onchange="updateAnalytics()">
+                            <option value="">Все годы</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="stats-grid" id="analytics-stats"></div>
+            </div>
+        </div>
+
+        <!-- Вкладка: История -->
+        <div id="tab-history" class="tab-content">
+            <div class="card">
+                <h2>
+                    <ion-icon name="time-outline" class="section-icon"></ion-icon>
+                    История показаний
+                </h2>
+                
+                <div class="filter-tabs">
+                    <button class="filter-tab active" onclick="filterHistory('all')">Все</button>
+                    <button class="filter-tab" onclick="filterHistory('electricity')">
+                        <ion-icon name="flash-outline"></ion-icon> Электричество
+                    </button>
+                    <button class="filter-tab" onclick="filterHistory('gas')">
+                        <ion-icon name="flame-outline"></ion-icon> Газ
+                    </button>
+                    <button class="filter-tab" onclick="filterHistory('salt')">
+                        <ion-icon name="snow-outline"></ion-icon> Соль
+                    </button>
+                    <button class="filter-tab" onclick="filterHistory('cartridge')">
+                        <ion-icon name="filter-outline"></ion-icon> Картридж
+                    </button>
+                </div>
+
+                <div id="history-list" class="history-list"></div>
+            </div>
+        </div>
+
+        <!-- Вкладка: Тарифы -->
+        <div id="tab-tariffs" class="tab-content">
+            <div class="card">
+                <h2>
+                    <ion-icon name="pricetag-outline" class="section-icon"></ion-icon>
+                    Управление тарифами
+                </h2>
+                
+                <div class="tariff-info">
+                    <ion-icon name="information-circle-outline"></ion-icon>
+                    Тарифы применяются с указанной даты.                </div>
+                
+                <form id="tariff-form" class="tariff-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>
+                                <ion-icon name="calendar-outline" class="form-icon"></ion-icon>
+                                Дата вступления в силу *
+                            </label>
+                            <input type="date" id="tariff-date" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h3>
+                            <ion-icon name="flash-outline" class="form-icon electricity-icon"></ion-icon>
+                            Электроэнергия
+                        </h3>
+                        <div class="form-row two-columns">
+                            <div class="form-group">
+                                <label>
+                                    <ion-icon name="sunny-outline" class="form-icon t1-icon"></ion-icon>
+                                    Т1 (день) ₽/кВт·ч
+                                </label>
+                                <input type="number" id="tariff-t1" step="0.01" min="0" required>
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <ion-icon name="moon-outline" class="form-icon t2-icon"></ion-icon>
+                                    Т2 (ночь) ₽/кВт·ч
+                                </label>
+                                <input type="number" id="tariff-t2" step="0.01" min="0" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h3>
+                            <ion-icon name="flame-outline" class="form-icon gas-icon"></ion-icon>
+                            Газ
+                        </h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>
+                                    <ion-icon name="flame-outline" class="form-icon"></ion-icon>
+                                    Газ ₽/м³
+                                </label>
+                                <input type="number" id="tariff-gas" step="0.01" min="0" required>
+                            </div>
+                        </div>                    </div>
+                    
+                    <button type="submit" class="btn btn-success">
+                        <ion-icon name="add-circle-outline" class="btn-icon"></ion-icon>
+                        Добавить тариф
+                    </button>
+                </form>
+
+                <div class="tariff-actions-panel">
+                    <h3>
+                        <ion-icon name="sync-outline" class="section-icon"></ion-icon>
+                        Массовые действия
+                    </h3>
+                    <button class="btn btn-secondary" onclick="recalculateAll()">
+                        <ion-icon name="calculator-outline" class="btn-icon"></ion-icon>
+                        Пересчитать все записи по актуальным тарифам
+                    </button>
+                </div>
+
+                <div class="tariffs-history">
+                    <h3>
+                        <ion-icon name="time-outline" class="section-icon"></ion-icon>
+                        История тарифов
+                    </h3>
+                    <div id="tariffs-list" class="tariffs-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Вкладка: Ещё -->
+        <div id="tab-more" class="tab-content">
+            <div class="card">
+                <h2>
+                    <ion-icon name="folder-open-outline" class="section-icon"></ion-icon>
+                    Управление данными
+                </h2>
+                
+                <div class="sync-status" id="sync-status">
+                    <ion-icon name="cloud-offline-outline"></ion-icon>
+                    <span>Локальное хранение</span>
+                </div>
+                
+                <div class="form-actions stacked">
+                    <button class="btn btn-success" onclick="exportData()">
+                        <ion-icon name="cloud-download-outline" class="btn-icon"></ion-icon>
+                        Экспорт данных (JSON)
+                    </button>
+                    
+                    <div class="import-wrapper">
+                        <button class="btn btn-secondary" id="import-trigger-btn">                            <ion-icon name="cloud-upload-outline" class="btn-icon"></ion-icon>
+                            Импорт данных
+                        </button>
+                        <input type="file" id="import-file" accept=".json" onchange="importData(event)">
+                    </div>
+                    
+                    <button class="btn btn-danger" onclick="resetAllData()">
+                        <ion-icon name="trash-outline" class="btn-icon"></ion-icon>
+                        Полный сброс данных
+                    </button>
+                </div>
+                
+                <p class="hint-text">
+                    При сбросе удаляются локальные данные. Данные в Firebase сохраняются.
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Плавающее нижнее меню -->
+    <nav class="floating-nav">
+        <button class="nav-btn active" onclick="switchTab('input', this)">
+            <ion-icon name="create-outline"></ion-icon>
+            <span>Ввод</span>
+        </button>
+        <button class="nav-btn" onclick="switchTab('analytics', this)">
+            <ion-icon name="stats-chart-outline"></ion-icon>
+            <span>Аналитика</span>
+        </button>
+        <button class="nav-btn" onclick="switchTab('history', this)">
+            <ion-icon name="time-outline"></ion-icon>
+            <span>История</span>
+        </button>
+        <button class="nav-btn" onclick="switchTab('tariffs', this)">
+            <ion-icon name="pricetag-outline"></ion-icon>
+            <span>Тарифы</span>
+        </button>
+        <button class="nav-btn" onclick="switchTab('more', this)">
+            <ion-icon name="ellipsis-horizontal-outline"></ion-icon>
+            <span>Ещё</span>
+        </button>
+    </nav>
+</body>
+</html>
