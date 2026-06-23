@@ -17,8 +17,11 @@ let tariffs = [];
 let currentFilter = 'all';
 let isFirebaseConnected = false;
 let currentInputType = 'electricity';
+let currentTariffType = 'electricity';
+
 
 // ===== ИНИЦИАЛИЗАЦИЯ =====
+// ✅ СТАЛО (правильно)
 document.addEventListener('DOMContentLoaded', async () => {
     await initFirebase();
     loadData();
@@ -29,6 +32,43 @@ document.addEventListener('DOMContentLoaded', async () => {
     updateAnalytics();
     setupTariffForm();
 });
+
+// ===== ЛОКАЛЬНОЕ ХРАНЕНИЕ =====
+function loadData() {
+    const savedRecords = localStorage.getItem('dom_records');
+    const savedTariffs = localStorage.getItem('dom_tariffs');
+    
+    if (savedRecords) records = JSON.parse(savedRecords);
+    if (savedTariffs) tariffs = JSON.parse(savedTariffs);
+    
+    // Тарифы по умолчанию из PDF
+    if (!tariffs || tariffs.length === 0 || (!tariffs.electricity && !tariffs.gas)) {
+        tariffs = {
+            electricity: [
+                { id: 'e1', date: '2023-09-25', t1: 3.72, t2: 0 },
+                { id: 'e2', date: '2023-10-25', t1: 3.71, t2: 0 },
+                { id: 'e3', date: '2024-01-25', t1: 3.71, t2: 0 },
+                { id: 'e4', date: '2024-06-18', t1: 3.71, t2: 0 },
+                { id: 'e5', date: '2024-06-24', t1: 3.89, t2: 2.39 },
+                { id: 'e6', date: '2024-07-24', t1: 4.48, t2: 2.75 },
+                { id: 'e7', date: '2025-07-24', t1: 5.15, t2: 3.10 }
+            ],
+            gas: [
+                { id: 'g1', date: '2025-07-24', value: 6.46 },
+                { id: 'g2', date: '2025-12-24', value: 7.23 },
+                { id: 'g3', date: '2026-01-15', value: 7.35 }
+            ]
+        };
+        
+        // ✅ Сохраняем локально
+        saveLocal();
+        
+        // ✅ Синхронизируем с Firebase
+        if (isFirebaseConnected) {
+            saveTariffs();
+        }
+    }
+}
 
 // ===== FIREBASE (modular SDK) =====
 async function initFirebase() {
@@ -62,13 +102,23 @@ async function syncFromFirebase() {
     if (!isFirebaseConnected) return;
     
     try {
-        const tariffsQuery = query(collection(db, 'tariffs'), orderBy('date', 'asc'));
-        const tariffsSnap = await getDocs(tariffsQuery);
-        const newTariffs = [];
-        tariffsSnap.forEach(docSnap => {
-            newTariffs.push({ id: docSnap.id, ...docSnap.data() });
+        // Загружаем тарифы на электричество
+        const elecQuery = query(collection(db, 'tariffs_electricity'), orderBy('date', 'asc'));
+        const elecSnap = await getDocs(elecQuery);
+        const newElecTariffs = [];
+        elecSnap.forEach(docSnap => {
+            newElecTariffs.push({ id: docSnap.id, ...docSnap.data() });
         });
         
+        // Загружаем тарифы на газ
+        const gasQuery = query(collection(db, 'tariffs_gas'), orderBy('date', 'asc'));
+        const gasSnap = await getDocs(gasQuery);
+        const newGasTariffs = [];
+        gasSnap.forEach(docSnap => {
+            newGasTariffs.push({ id: docSnap.id, ...docSnap.data() });
+        });
+        
+        // Загружаем записи
         const recordsQuery = query(collection(db, 'records'));
         const recordsSnap = await getDocs(recordsQuery);
         const newRecords = [];
@@ -76,7 +126,13 @@ async function syncFromFirebase() {
             newRecords.push({ id: docSnap.id, ...docSnap.data() });
         });
         
-        if (newTariffs.length > 0) tariffs = newTariffs;
+        // Если в Firebase есть данные - используем их
+        if (newElecTariffs.length > 0 || newGasTariffs.length > 0) {
+            tariffs = {
+                electricity: newElecTariffs,
+                gas: newGasTariffs
+            };
+        }
         if (newRecords.length > 0) records = newRecords;
         
         saveLocal();
@@ -84,7 +140,7 @@ async function syncFromFirebase() {
         updateHistory();
         updateAnalytics();
         
-        console.log('✅ Синхронизация из Firebase:', records.length, 'записей,', tariffs.length, 'тарифов');
+        console.log('✅ Синхронизация из Firebase:', records.length, 'записей');
     } catch (error) {
         console.error('Sync from Firebase error:', error);
     }
@@ -134,29 +190,7 @@ async function deleteTariffFromFirebase(id) {
     }
 }
 
-// ===== ЛОКАЛЬНОЕ ХРАНЕНИЕ =====
-function loadData() {
-    const savedRecords = localStorage.getItem('dom_records');
-    const savedTariffs = localStorage.getItem('dom_tariffs');
-    
-    if (savedRecords) records = JSON.parse(savedRecords);
-    if (savedTariffs) tariffs = JSON.parse(savedTariffs);
-    
-    // Тарифы по умолчанию из PDF
-    if (tariffs.length === 0) {
-        tariffs = [
-            { id: 't1', date: '2023-09-25', t1: 3.72, t2: 0, gas: 0 },
-            { id: 't2', date: '2023-10-25', t1: 3.71, t2: 0, gas: 0 },            { id: 't3', date: '2024-01-25', t1: 3.71, t2: 0, gas: 0 },
-            { id: 't4', date: '2024-06-18', t1: 3.71, t2: 0, gas: 0 },
-            { id: 't5', date: '2024-06-24', t1: 3.89, t2: 2.39, gas: 0 },
-            { id: 't6', date: '2024-07-24', t1: 4.48, t2: 2.75, gas: 0 },
-            { id: 't7', date: '2025-07-24', t1: 5.15, t2: 3.10, gas: 6.46 },
-            { id: 't8', date: '2025-12-24', t1: 5.15, t2: 3.10, gas: 7.23 },
-            { id: 't9', date: '2026-01-15', t1: 5.15, t2: 3.10, gas: 7.35 }
-        ];
-        saveLocal();
-    }
-}
+
 
 function saveLocal() {
     localStorage.setItem('dom_records', JSON.stringify(records));
@@ -169,12 +203,25 @@ async function saveTariffs() {
     if (isFirebaseConnected) {
         try {
             const batch = writeBatch(db);
-            tariffs.forEach(tariff => {
-                const ref = doc(db, 'tariffs', tariff.id);
-                batch.set(ref, tariff);
-            });
+            
+            // Сохраняем тарифы на электричество
+            if (tariffs.electricity) {
+                tariffs.electricity.forEach(tariff => {
+                    const ref = doc(db, 'tariffs_electricity', tariff.id);
+                    batch.set(ref, tariff);
+                });
+            }
+            
+            // Сохраняем тарифы на газ
+            if (tariffs.gas) {
+                tariffs.gas.forEach(tariff => {
+                    const ref = doc(db, 'tariffs_gas', tariff.id);
+                    batch.set(ref, tariff);
+                });
+            }
+            
             await batch.commit();
-            console.log('✅ Тарифы сохранены в Firebase:', tariffs.length);
+            console.log('✅ Тарифы сохранены в Firebase');
         } catch (error) {
             console.error('❌ Ошибка сохранения тарифов:', error);
         }
@@ -248,22 +295,25 @@ function autoCalcElectric() {
     const t2 = parseFloat(document.getElementById('elec-t2').value) || 0;
     
     const lastRecord = getLastElectricRecord();
-    const tariff = getCurrentTariff();
+    const tariff = getCurrentTariff('electricity');
     
     if (lastRecord && tariff) {
         const consumptionT1 = Math.max(0, t1 - lastRecord.t1);
         const consumptionT2 = Math.max(0, t2 - lastRecord.t2);
         
-        document.getElementById('elec-t1-consumption').textContent = `${consumptionT1.toFixed(2)} кВт·ч`;        document.getElementById('elec-t2-consumption').textContent = `${consumptionT2.toFixed(2)} кВт·ч`;
+        document.getElementById('elec-t1-consumption').textContent = `${consumptionT1.toFixed(2)} кВт·ч`;
+        document.getElementById('elec-t2-consumption').textContent = `${consumptionT2.toFixed(2)} кВт·ч`;
         
         const total = (consumptionT1 * tariff.t1) + (consumptionT2 * (tariff.t2 || 0));
         document.getElementById('elec-total').textContent = `${total.toFixed(2)} ₽`;
     } else {
         document.getElementById('elec-t1-consumption').textContent = '0 кВт·ч';
         document.getElementById('elec-t2-consumption').textContent = '0 кВт·ч';
-        document.getElementById('elec-total').textContent = 'Нет данных';
+        document.getElementById('elec-total').textContent = 'Нет тарифа';
     }
 }
+
+
 
 function getLastElectricRecord() {
     const elecRecords = records
@@ -276,12 +326,12 @@ function getLastElectricRecord() {
 function autoCalcGas() {
     const reading = parseFloat(document.getElementById('gas-reading').value) || 0;
     const lastRecord = getLastGasRecord();
-    const tariff = getCurrentTariff();
+    const tariff = getCurrentTariff('gas');
     
-    if (lastRecord && tariff && tariff.gas) {
+    if (lastRecord && tariff) {
         const consumption = Math.max(0, reading - lastRecord.reading);
         document.getElementById('gas-consumption').textContent = `${consumption.toFixed(2)} м³`;
-        document.getElementById('gas-total').textContent = `${(consumption * tariff.gas).toFixed(2)} ₽`;
+        document.getElementById('gas-total').textContent = `${(consumption * tariff.value).toFixed(2)} ₽`;
     } else {
         document.getElementById('gas-consumption').textContent = '0 м³';
         document.getElementById('gas-total').textContent = 'Нет тарифа';
@@ -296,100 +346,177 @@ function getLastGasRecord() {
 }
 
 // ===== ТАРИФЫ =====
-function getCurrentTariff() {
+function getCurrentTariff(type) {
     const today = new Date().toISOString().split('T')[0];
-    const validTariffs = tariffs
+    const tariffList = tariffs[type] || [];
+    const validTariffs = tariffList
         .filter(t => t.date <= today)
         .sort((a, b) => new Date(b.date) - new Date(a.date));
     return validTariffs[0] || null;
 }
-function getTariffForDate(date) {
-    const validTariffs = tariffs
+
+function getTariffForDate(type, date) {
+    const tariffList = tariffs[type] || [];
+    const validTariffs = tariffList
         .filter(t => t.date <= date)
         .sort((a, b) => new Date(b.date) - new Date(a.date));
-    return validTariffs[0] || tariffs[0];
+    return validTariffs[0] || (tariffList[0] || {});
 }
 
 function setupTariffForm() {
-    const form = document.getElementById('tariff-form');
-    if (!form) return;
+    // Форма для электричества
+    const elecForm = document.getElementById('tariff-form-electricity');
+    if (elecForm) {
+        elecForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const tariff = {
+                id: 'elec_' + Date.now(),
+                date: document.getElementById('tariff-elec-date').value,
+                t1: parseFloat(document.getElementById('tariff-t1').value),
+                t2: parseFloat(document.getElementById('tariff-t2').value) || 0,
+                createdAt: new Date().toISOString()
+            };
+            
+            if (!tariffs.electricity) tariffs.electricity = [];
+            tariffs.electricity.push(tariff);
+            tariffs.electricity.sort((a, b) => new Date(a.date) - new Date(b.date));
+            
+            await saveTariffs();
+            updateTariffList();
+            
+            elecForm.reset();
+            document.getElementById('tariff-elec-date').value = new Date().toISOString().split('T')[0];
+            
+            alert('✓ Тариф на электричество добавлен!');
+        });
+    }
     
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        const tariff = {
-            id: 'tariff_' + Date.now(),
-            date: document.getElementById('tariff-date').value,
-            t1: parseFloat(document.getElementById('tariff-t1').value),
-            t2: parseFloat(document.getElementById('tariff-t2').value) || 0,
-            gas: parseFloat(document.getElementById('tariff-gas').value) || 0,
-            createdAt: new Date().toISOString()
-        };
-        
-        tariffs.push(tariff);
-        tariffs.sort((a, b) => new Date(a.date) - new Date(b.date));
-        
-        await saveTariffs();
-        updateTariffList();
-        
-        form.reset();
-        initDates();
-        
-        alert('✓ Тариф добавлен!');
-    });
+    // Форма для газа
+    const gasForm = document.getElementById('tariff-form-gas');
+    if (gasForm) {
+        gasForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const tariff = {
+                id: 'gas_' + Date.now(),
+                date: document.getElementById('tariff-gas-date').value,
+                value: parseFloat(document.getElementById('tariff-gas-value').value),
+                createdAt: new Date().toISOString()
+            };
+            
+            if (!tariffs.gas) tariffs.gas = [];
+            tariffs.gas.push(tariff);
+            tariffs.gas.sort((a, b) => new Date(a.date) - new Date(b.date));
+            
+            await saveTariffs();
+            updateTariffList();
+            
+            gasForm.reset();
+            document.getElementById('tariff-gas-date').value = new Date().toISOString().split('T')[0];
+            
+            alert('✓ Тариф на газ добавлен!');
+        });
+    }
 }
 
 function updateTariffList() {
-    const list = document.getElementById('tariffs-list');
-    if (!list) return;
-    
-    const currentTariff = getCurrentTariff();
-    const sorted = [...tariffs].sort((a, b) => new Date(b.date) - new Date(a.date));
-    
-    if (sorted.length === 0) {
-        list.innerHTML = '<p class="hint-text">Нет сохраненных тарифов</p>';
-        return;
+    // Обновляем список тарифов на электричество
+    const elecList = document.getElementById('tariffs-list-electricity');
+    if (elecList) {
+        const currentElecTariff = getCurrentTariff('electricity');
+        const sortedElec = [...(tariffs.electricity || [])].sort((a, b) => new Date(b.date) - new Date(a.date));
+        
+        if (sortedElec.length === 0) {
+            elecList.innerHTML = '<p class="hint-text">Нет сохраненных тарифов</p>';
+        } else {
+            elecList.innerHTML = sortedElec.map(t => {
+                const isCurrent = currentElecTariff && t.id === currentElecTariff.id;
+                return `
+                    <div class="tariff-item ${isCurrent ? 'current' : ''}">
+                        <div class="tariff-date">
+                            <ion-icon name="calendar-outline"></ion-icon>
+                            ${formatDate(t.date)}
+                            ${isCurrent ? '<span style="color: var(--ios-success); font-weight: bold; margin-left: 8px;">(действует)</span>' : ''}
+                        </div>
+                        <div class="tariff-values">
+                            <div>
+                                <ion-icon name="sunny-outline" style="color: var(--ios-warning);"></ion-icon>
+                                Т1: ${t.t1} ₽/кВт·ч
+                            </div>
+                            <div>
+                                <ion-icon name="moon-outline" style="color: var(--ios-accent);"></ion-icon>
+                                Т2: ${t.t2 || 0} ₽/кВт·ч
+                            </div>
+                        </div>
+                        <div class="tariff-actions">
+                            <button class="btn btn-danger" onclick="deleteTariff('electricity', '${t.id}')">
+                                <ion-icon name="trash-outline"></ion-icon>
+                                Удалить
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
     }
     
-    list.innerHTML = sorted.map(t => {
-        const isCurrent = currentTariff && t.id === currentTariff.id;        return `
-            <div class="tariff-item ${isCurrent ? 'current' : ''}">
-                <div class="tariff-date">
-                    <ion-icon name="calendar-outline"></ion-icon>
-                    ${formatDate(t.date)}
-                    ${isCurrent ? '<span style="color: var(--ios-success); font-weight: bold; margin-left: 8px;">(действует)</span>' : ''}
-                </div>
-                <div class="tariff-values">
-                    <div>
-                        <ion-icon name="sunny-outline" style="color: var(--ios-warning);"></ion-icon>
-                        Т1: ${t.t1} ₽/кВт·ч
+    // Обновляем список тарифов на газ
+    const gasList = document.getElementById('tariffs-list-gas');
+    if (gasList) {
+        const currentGasTariff = getCurrentTariff('gas');
+        const sortedGas = [...(tariffs.gas || [])].sort((a, b) => new Date(b.date) - new Date(a.date));
+        
+        if (sortedGas.length === 0) {
+            gasList.innerHTML = '<p class="hint-text">Нет сохраненных тарифов</p>';
+        } else {
+            gasList.innerHTML = sortedGas.map(t => {
+                const isCurrent = currentGasTariff && t.id === currentGasTariff.id;
+                return `
+                    <div class="tariff-item ${isCurrent ? 'current' : ''}">
+                        <div class="tariff-date">
+                            <ion-icon name="calendar-outline"></ion-icon>
+                            ${formatDate(t.date)}
+                            ${isCurrent ? '<span style="color: var(--ios-success); font-weight: bold; margin-left: 8px;">(действует)</span>' : ''}
+                        </div>
+                        <div class="tariff-values">
+                            <div>
+                                <ion-icon name="flame-outline" style="color: var(--ios-warning);"></ion-icon>
+                                Газ: ${t.value} ₽/м³
+                            </div>
+                        </div>
+                        <div class="tariff-actions">
+                            <button class="btn btn-danger" onclick="deleteTariff('gas', '${t.id}')">
+                                <ion-icon name="trash-outline"></ion-icon>
+                                Удалить
+                            </button>
+                        </div>
                     </div>
-                    <div>
-                        <ion-icon name="moon-outline" style="color: var(--ios-accent);"></ion-icon>
-                        Т2: ${t.t2 || 0} ₽/кВт·ч
-                    </div>
-                    <div>
-                        <ion-icon name="flame-outline" style="color: var(--ios-warning);"></ion-icon>
-                        Газ: ${t.gas || 0} ₽/м³
-                    </div>
-                </div>
-                <div class="tariff-actions">
-                    <button class="btn btn-danger" onclick="deleteTariff('${t.id}')">
-                        <ion-icon name="trash-outline"></ion-icon>
-                        Удалить
-                    </button>
-                </div>
-            </div>
-        `;
-    }).join('');
+                `;
+            }).join('');
+        }
+    }
 }
 
-async function deleteTariff(id) {
+async function deleteTariff(type, id) {
     if (!confirm('Удалить этот тариф?')) return;
     
-    tariffs = tariffs.filter(t => t.id !== id);
+    if (tariffs[type]) {
+        tariffs[type] = tariffs[type].filter(t => t.id !== id);
+    }
+    
     saveLocal();
-    await deleteTariffFromFirebase(id);
+    
+    if (isFirebaseConnected) {
+        try {
+            const collectionName = type === 'electricity' ? 'tariffs_electricity' : 'tariffs_gas';
+            await deleteDoc(doc(db, collectionName, id));
+            console.log('✅ Тариф удален из Firebase');
+        } catch (error) {
+            console.error('Delete tariff error:', error);
+        }
+    }
+    
     updateTariffList();
 }
 
@@ -876,6 +1003,33 @@ function clearForm(type) {
     initDates();
 }
 
+function showTariffType(type, btn) {
+    currentTariffType = type;
+    
+    // Скрываем все формы
+    document.querySelectorAll('.tariff-form-section').forEach(section => {
+        section.classList.remove('active');
+    });
+    
+    // Убираем активность с кнопок
+    document.querySelectorAll('.tariff-type-btn').forEach(b => {
+        b.classList.remove('active');
+    });
+    
+    // Показываем нужную форму
+    document.getElementById(`tariff-${type}`).classList.add('active');
+    
+    // Активируем кнопку
+    if (btn) btn.classList.add('active');
+    
+    // Инициализируем даты
+    if (type === 'electricity') {
+        document.getElementById('tariff-elec-date').value = new Date().toISOString().split('T')[0];
+    } else {
+        document.getElementById('tariff-gas-date').value = new Date().toISOString().split('T')[0];
+    }
+}
+
 // ===== ЭКСПОРТ ФУНКЦИЙ В ГЛОБАЛЬНУЮ ОБЛАСТЬ =====
 window.switchTab = switchTab;
 window.autoCalcElectric = autoCalcElectric;
@@ -892,3 +1046,4 @@ window.importData = importData;
 window.resetAllData = resetAllData;
 window.recalculateAll = recalculateAll;
 window.showInputType = showInputType;
+window.showTariffType = showTariffType;

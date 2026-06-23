@@ -18,7 +18,7 @@
     <script nomodule src="https://unpkg.com/ionicons@7.4.0/dist/ionicons/ionicons.js"></script>
     
     <script type="module" src="firebase-config.js"></script>
-    <script type="module" src="script.js"></script>
+    <script type="module" src="script.js?v=1.0.0"></script>
 </head>
 <body>
     <header class="top-header">
@@ -294,92 +294,126 @@
         </div>
 
         <!-- Вкладка: Тарифы -->
-        <div id="tab-tariffs" class="tab-content">
-            <div class="card">
-                <h2>
-                    <ion-icon name="pricetag-outline" class="section-icon"></ion-icon>
-                    Управление тарифами
-                </h2>
-                
-                <div class="tariff-info">
-                    <ion-icon name="information-circle-outline"></ion-icon>
-                    Тарифы применяются с указанной даты.                </div>
-                
-                <form id="tariff-form" class="tariff-form">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>
-                                <ion-icon name="calendar-outline" class="form-icon"></ion-icon>
-                                Дата вступления в силу *
-                            </label>
-                            <input type="date" id="tariff-date" required>
-                        </div>
-                    </div>
-                    
-                    <div class="form-section">
-                        <h3>
-                            <ion-icon name="flash-outline" class="form-icon electricity-icon"></ion-icon>
-                            Электроэнергия
-                        </h3>
-                        <div class="form-row two-columns">
-                            <div class="form-group">
-                                <label>
-                                    <ion-icon name="sunny-outline" class="form-icon t1-icon"></ion-icon>
-                                    Т1 (день) ₽/кВт·ч
-                                </label>
-                                <input type="number" id="tariff-t1" step="0.01" min="0" required>
-                            </div>
-                            <div class="form-group">
-                                <label>
-                                    <ion-icon name="moon-outline" class="form-icon t2-icon"></ion-icon>
-                                    Т2 (ночь) ₽/кВт·ч
-                                </label>
-                                <input type="number" id="tariff-t2" step="0.01" min="0" required>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-section">
-                        <h3>
-                            <ion-icon name="flame-outline" class="form-icon gas-icon"></ion-icon>
-                            Газ
-                        </h3>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>
-                                    <ion-icon name="flame-outline" class="form-icon"></ion-icon>
-                                    Газ ₽/м³
-                                </label>
-                                <input type="number" id="tariff-gas" step="0.01" min="0" required>
-                            </div>
-                        </div>                    </div>
-                    
-                    <button type="submit" class="btn btn-success">
-                        <ion-icon name="add-circle-outline" class="btn-icon"></ion-icon>
-                        Добавить тариф
-                    </button>
-                </form>
-
-                <div class="tariff-actions-panel">
-                    <h3>
-                        <ion-icon name="sync-outline" class="section-icon"></ion-icon>
-                        Массовые действия
-                    </h3>
-                    <button class="btn btn-secondary" onclick="recalculateAll()">
-                        <ion-icon name="calculator-outline" class="btn-icon"></ion-icon>
-                        Пересчитать все записи по актуальным тарифам
-                    </button>
-                </div>
-
-                <div class="tariffs-history">
-                    <h3>
-                        <ion-icon name="time-outline" class="section-icon"></ion-icon>
-                        История тарифов
-                    </h3>
-                    <div id="tariffs-list" class="tariffs-list"></div>
-                </div>
-            </div>
+<div id="tab-tariffs" class="tab-content">
+    <div class="card">
+        <h2>
+            <ion-icon name="pricetag-outline" class="section-icon"></ion-icon>
+            Управление тарифами
+        </h2>
+        
+        <div class="tariff-info">
+            <ion-icon name="information-circle-outline"></ion-icon>
+            Тарифы применяются с указанной даты.
         </div>
+        
+        <!-- Переключатель типа тарифа -->
+        <div class="tariff-type-selector">
+            <button class="tariff-type-btn active" onclick="showTariffType('electricity', this)">
+                <ion-icon name="flash-outline"></ion-icon>
+                <span>Электроэнергия</span>
+            </button>
+            <button class="tariff-type-btn" onclick="showTariffType('gas', this)">
+                <ion-icon name="flame-outline"></ion-icon>
+                <span>Газ</span>
+            </button>
+        </div>
+        
+        <!-- Форма: Тарифы на электричество -->
+        <div id="tariff-electricity" class="tariff-form-section active">
+            <form id="tariff-form-electricity" class="tariff-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>
+                            <ion-icon name="calendar-outline" class="form-icon"></ion-icon>
+                            Дата вступления в силу *
+                        </label>
+                        <input type="date" id="tariff-elec-date" required>
+                    </div>
+                </div>
+                
+                <div class="form-row two-columns">
+                    <div class="form-group">
+                        <label>
+                            <ion-icon name="sunny-outline" class="form-icon t1-icon"></ion-icon>
+                            Т1 (день) ₽/кВт·ч
+                        </label>
+                        <input type="number" id="tariff-t1" step="0.01" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <ion-icon name="moon-outline" class="form-icon t2-icon"></ion-icon>
+                            Т2 (ночь) ₽/кВт·ч                        </label>
+                        <input type="number" id="tariff-t2" step="0.01" min="0" required>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-success">
+                    <ion-icon name="add-circle-outline" class="btn-icon"></ion-icon>
+                    Добавить тариф на электричество
+                </button>
+            </form>
+        </div>
+        
+        <!-- Форма: Тарифы на газ -->
+        <div id="tariff-gas" class="tariff-form-section">
+            <form id="tariff-form-gas" class="tariff-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>
+                            <ion-icon name="calendar-outline" class="form-icon"></ion-icon>
+                            Дата вступления в силу *
+                        </label>
+                        <input type="date" id="tariff-gas-date" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>
+                            <ion-icon name="flame-outline" class="form-icon"></ion-icon>
+                            Газ ₽/м³
+                        </label>
+                        <input type="number" id="tariff-gas-value" step="0.01" min="0" required>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-success">
+                    <ion-icon name="add-circle-outline" class="btn-icon"></ion-icon>
+                    Добавить тариф на газ
+                </button>
+            </form>
+        </div>
+
+        <div class="tariff-actions-panel">
+            <h3>
+                <ion-icon name="sync-outline" class="section-icon"></ion-icon>
+                Массовые действия
+            </h3>
+            <button class="btn btn-secondary" onclick="recalculateAll()">
+                <ion-icon name="calculator-outline" class="btn-icon"></ion-icon>
+                Пересчитать все записи по актуальным тарифам            </button>
+        </div>
+
+        <div class="tariffs-history">
+            <h3>
+                <ion-icon name="time-outline" class="section-icon"></ion-icon>
+                История тарифов
+            </h3>
+            
+            <h4 style="margin: 16px 0 8px 0; font-size: 16px; color: var(--ios-warning); display: flex; align-items: center; gap: 6px;">
+                <ion-icon name="flash-outline"></ion-icon>
+                Электроэнергия
+            </h4>
+            <div id="tariffs-list-electricity" class="tariffs-list"></div>
+            
+            <h4 style="margin: 24px 0 8px 0; font-size: 16px; color: var(--ios-warning); display: flex; align-items: center; gap: 6px;">
+                <ion-icon name="flame-outline"></ion-icon>
+                Газ
+            </h4>
+            <div id="tariffs-list-gas" class="tariffs-list"></div>
+        </div>
+    </div>
+</div>
 
         <!-- Вкладка: Ещё -->
         <div id="tab-more" class="tab-content">
