@@ -1428,3 +1428,227 @@ input:focus, select:focus {
         grid-template-columns: 1fr;
     }
 }
+
+/* ===== МОДАЛЬНОЕ ОКНО РЕДАКТИРОВАНИЯ ===== */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: fadeIn 0.2s ease;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal-content {
+    background: var(--ios-card);
+    border-radius: 16px;
+    width: 100%;
+    max-width: 500px;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--ios-border);
+    position: sticky;
+    top: 0;
+    background: var(--ios-card);
+    border-radius: 16px 16px 0 0;
+    z-index: 1;
+}
+
+.modal-header h3 {
+    font-size: 20px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+}
+
+.modal-header h3 ion-icon {
+    font-size: 24px;
+    color: var(--ios-accent);
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.modal-close ion-icon {
+    font-size: 24px;
+    color: var(--ios-text-secondary);
+}
+
+.modal-close:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.modal-body {
+    padding: 24px;
+}
+
+.modal-body .form-group {
+    margin-bottom: 16px;
+}
+
+.modal-body .form-group label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ios-text-secondary);
+    margin-bottom: 8px;
+}
+
+.modal-body .form-group label ion-icon {
+    font-size: 20px;
+}
+
+.modal-body input,
+.modal-body select {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1.5px solid var(--ios-border);
+    border-radius: 10px;
+    font-size: 16px;
+    background: var(--ios-bg);
+    transition: all 0.2s;
+    font-family: inherit;
+}
+
+.modal-body input:focus {
+    outline: none;
+    border-color: var(--ios-accent);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+}
+
+.modal-body .form-row {
+    margin-bottom: 16px;
+}
+
+.modal-body .form-row.two-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.modal-body .calc-results {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 14px;
+    margin-top: 12px;
+}
+
+.modal-body .calc-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--ios-border);
+    font-size: 14px;
+}
+
+.modal-body .calc-item:last-child {
+    border-bottom: none;
+}
+
+.modal-body .calc-item.total {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ios-accent);
+}
+
+.modal-footer {
+    display: flex;
+    gap: 12px;
+    padding: 16px 24px;
+    border-top: 1px solid var(--ios-border);
+    position: sticky;
+    bottom: 0;
+    background: var(--ios-card);
+    border-radius: 0 0 16px 16px;
+}
+
+.modal-footer .btn {
+    flex: 1;
+    justify-content: center;
+}
+
+/* Адаптивность модального окна */
+@media (max-width: 480px) {
+    .modal-overlay {
+        padding: 10px;
+        align-items: flex-end;
+    }
+    
+    .modal-content {
+        max-height: 90vh;
+        border-radius: 16px 16px 0 0;
+        animation: slideUpMobile 0.3s ease;
+    }
+    
+    @keyframes slideUpMobile {
+        from {
+            opacity: 0;
+            transform: translateY(100%);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .modal-header {
+        padding: 16px 20px;
+    }
+    
+    .modal-body {
+        padding: 20px;
+    }
+    
+    .modal-footer {
+        padding: 12px 20px;
+    }
+    
+    .modal-body .form-row.two-columns {
+        grid-template-columns: 1fr;
+    }
+}

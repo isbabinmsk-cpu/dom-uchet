@@ -18,7 +18,7 @@
     <script nomodule src="https://unpkg.com/ionicons@7.4.0/dist/ionicons/ionicons.js"></script>
     
     <script type="module" src="firebase-config.js?v=3.0.0"></script>
-    <script type="module" src="script.js?v=3.0.0"></script>
+    <script type="module" src="script.js?v=4.0.0"></script>
 </head>
 <body>
     <header class="top-header">
@@ -92,17 +92,19 @@
                         </div>
                         
                         <div class="calc-results">
-                            <div class="calc-item">
-                                <span>Расход Т1:</span>
-                                <strong id="elec-t1-consumption">0 кВт·ч</strong>
-                            </div>
-                            <div class="calc-item">                                <span>Расход Т2:</span>
-                                <strong id="elec-t2-consumption">0 кВт·ч</strong>
-                            </div>
-                            <div class="calc-item total">
-                                <span>Стоимость:</span>
-                                <strong id="elec-total">0 ₽</strong>
-                            </div>
+    <div class="calc-item">
+        <span>Расход Т1:</span>
+        <strong id="elec-t1-consumption">0 кВт·ч</strong>
+    </div>
+    <div class="calc-item">
+        <span>Расход Т2:</span>
+        <strong id="elec-t2-consumption">0 кВт·ч</strong>
+    </div>
+    <div class="calc-item total">
+        <span>Стоимость:</span>
+        <strong id="elec-total">0 ₽</strong>
+    </div>
+</div>
                         </div>
                     </div>
                     
@@ -119,14 +121,14 @@
                                     <ion-icon name="calendar-outline" class="form-icon"></ion-icon>
                                     Дата оплаты *
                                 </label>
-                                <input type="date" id="pay-elec-date" required>
+                                <input type="date" id="pay-elec-date">
                             </div>
                             <div class="form-group">
                                 <label>
                                     <ion-icon name="cash-outline" class="form-icon"></ion-icon>
                                     Сумма (₽) *
                                 </label>
-                                <input type="number" id="pay-elec-amount" step="0.01" min="0" required>
+                                <input type="number" id="pay-elec-amount" step="0.01" min="0">
                             </div>
                         </div>
                     </div>
@@ -198,14 +200,14 @@
                                     <ion-icon name="calendar-outline" class="form-icon"></ion-icon>
                                     Дата оплаты *
                                 </label>
-                                <input type="date" id="pay-gas-date" required>
+                                <input type="date" id="pay-gas-date">
                             </div>
                             <div class="form-group">
                                 <label>
                                     <ion-icon name="cash-outline" class="form-icon"></ion-icon>
                                     Сумма (₽) *
                                 </label>
-                                <input type="number" id="pay-gas-amount" step="0.01" min="0" required>
+                                <input type="number" id="pay-gas-amount" step="0.01" min="0">
                             </div>
                         </div>
                     </div>
@@ -440,34 +442,80 @@
                     </button>
                 </div>
                                 <!-- Форма: Тарифы на электричество -->
-                <div id="tariff-electricity" class="tariff-form-section active">
-                    <form id="tariff-form-electricity" class="tariff-form">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>
-                                    <ion-icon name="calendar-outline" class="form-icon"></ion-icon>
-                                    Дата вступления в силу *
-                                </label>
-                                <input type="date" id="tariff-elec-date" required>
-                            </div>
-                        </div>
-                        
-                        <div class="form-row two-columns">
-                            <div class="form-group">
-                                <label>
-                                    <ion-icon name="sunny-outline" class="form-icon t1-icon"></ion-icon>
-                                    Т1 (день) ₽/кВт·ч
-                                </label>
-                                <input type="number" id="tariff-t1" step="0.01" min="0" required>
-                            </div>
-                            <div class="form-group">
-                                <label>
-                                    <ion-icon name="moon-outline" class="form-icon t2-icon"></ion-icon>
-                                    Т2 (ночь) ₽/кВт·ч
-                                </label>
-                                <input type="number" id="tariff-t2" step="0.01" min="0" required>
-                            </div>
-                        </div>
+<div id="tariff-electricity" class="tariff-form-section active">
+    <form id="tariff-form-electricity" class="tariff-form">
+        <div class="form-row">
+            <div class="form-group">
+                <label>
+                    <ion-icon name="calendar-outline" class="form-icon"></ion-icon>
+                    Дата вступления в силу *
+                </label>
+                <input type="date" id="tariff-elec-date" required>
+            </div>
+        </div>
+        
+        <div class="form-section" style="background: #f8f9fa; padding: 16px; border-radius: 12px; margin-bottom: 16px;">
+            <h4 style="margin: 0 0 12px 0; font-size: 15px; color: var(--ios-text-secondary);">
+                <ion-icon name="flash-outline" style="color: var(--ios-warning);"></ion-icon>
+                Обычные тарифы
+            </h4>
+            
+            <div class="form-row two-columns">
+                <div class="form-group">
+                    <label>
+                        <ion-icon name="sunny-outline" class="form-icon t1-icon"></ion-icon>
+                        Т1 (день) ₽/кВт·ч
+                    </label>
+                    <input type="number" id="tariff-t1" step="0.01" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <ion-icon name="moon-outline" class="form-icon t2-icon"></ion-icon>
+                        Т2 (ночь) ₽/кВт·ч
+                    </label>
+                    <input type="number" id="tariff-t2" step="0.01" min="0" required>
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-section" style="background: #fff3cd; padding: 16px; border-radius: 12px; margin-bottom: 16px; border-left: 4px solid var(--ios-warning);">
+            <h4 style="margin: 0 0 12px 0; font-size: 15px; color: var(--ios-text-secondary);">
+                <ion-icon name="trending-up-outline" style="color: var(--ios-danger);"></ion-icon>
+                Повышенные тарифы (при расходе >3000 кВт·ч)
+            </h4>
+            <p style="font-size: 13px; color: var(--ios-text-tertiary); margin-bottom: 12px;">
+                Применяются к части расхода сверх 3000 кВт·ч
+            </p>
+            
+            <div class="form-row two-columns">
+                <div class="form-group">
+                    <label>
+                        <ion-icon name="sunny-outline" class="form-icon t1-icon"></ion-icon>
+                        Т1 повышенный ₽/кВт·ч
+                    </label>
+                    <input type="number" id="tariff-over-t1" step="0.01" min="0" placeholder="Например: 4.49">
+                </div>
+                <div class="form-group">
+                    <label>
+                        <ion-icon name="moon-outline" class="form-icon t2-icon"></ion-icon>
+                        Т2 повышенный ₽/кВт·ч
+                    </label>
+                    <input type="number" id="tariff-over-t2" step="0.01" min="0" placeholder="Например: 2.76">
+                </div>
+            </div>
+            
+            <button type="button" class="btn btn-secondary" onclick="autoFillOverTariffs()" style="margin-top: 8px; width: 100%; font-size: 13px;">
+                <ion-icon name="copy-outline"></ion-icon>
+                Автозаполнить (+0.01 к обычным)
+            </button>
+        </div>
+        
+        <button type="submit" class="btn btn-success">
+            <ion-icon name="add-circle-outline" class="btn-icon"></ion-icon>
+            Добавить тариф на электричество
+        </button>
+    </form>
+</div>
                         
                         <button type="submit" class="btn btn-success">
                             <ion-icon name="add-circle-outline" class="btn-icon"></ion-icon>
@@ -627,6 +675,92 @@
                 Отмена
             </button>
             <button class="btn btn-success" onclick="saveEditedRecord()">
+                <ion-icon name="save-outline"></ion-icon>
+                Сохранить
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно редактирования тарифа -->
+<div id="edit-tariff-modal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="edit-tariff-title">
+                <ion-icon name="create-outline"></ion-icon>
+                Редактирование тарифа
+            </h3>
+            <button class="modal-close" onclick="closeEditTariffModal()">
+                <ion-icon name="close-outline"></ion-icon>
+            </button>
+        </div>
+        
+        <div class="modal-body" id="edit-tariff-body">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>
+                        <ion-icon name="calendar-outline" class="form-icon"></ion-icon>
+                        Дата вступления в силу *
+                    </label>
+                    <input type="date" id="edit-tariff-date" required>
+                </div>
+            </div>
+            
+            <div class="form-section" style="background: #f8f9fa; padding: 16px; border-radius: 12px; margin-bottom: 16px;">
+                <h4 style="margin: 0 0 12px 0; font-size: 15px; color: var(--ios-text-secondary);">
+                    <ion-icon name="flash-outline" style="color: var(--ios-warning);"></ion-icon>
+                    Обычные тарифы
+                </h4>
+                
+                <div class="form-row two-columns">
+                    <div class="form-group">
+                        <label>
+                            <ion-icon name="sunny-outline" class="form-icon t1-icon"></ion-icon>
+                            Т1 (день) ₽/кВт·ч
+                        </label>
+                        <input type="number" id="edit-tariff-t1" step="0.01" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <ion-icon name="moon-outline" class="form-icon t2-icon"></ion-icon>
+                            Т2 (ночь) ₽/кВт·ч
+                        </label>
+                        <input type="number" id="edit-tariff-t2" step="0.01" min="0" required>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-section" style="background: #fff3cd; padding: 16px; border-radius: 12px; margin-bottom: 16px; border-left: 4px solid var(--ios-warning);">
+                <h4 style="margin: 0 0 12px 0; font-size: 15px; color: var(--ios-text-secondary);">
+                    <ion-icon name="trending-up-outline" style="color: var(--ios-danger);"></ion-icon>
+                    Повышенные тарифы (сверх 3000 кВт·ч)
+                </h4>
+                
+                <div class="form-row two-columns">
+                    <div class="form-group">
+                        <label>
+                            <ion-icon name="sunny-outline" class="form-icon t1-icon"></ion-icon>
+                            Т1 повышенный ₽/кВт·ч
+                        </label>
+                        <input type="number" id="edit-tariff-over-t1" step="0.01" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <ion-icon name="moon-outline" class="form-icon t2-icon"></ion-icon>
+                            Т2 повышенный ₽/кВт·ч
+                        </label>
+                        <input type="number" id="edit-tariff-over-t2" step="0.01" min="0">
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeEditTariffModal()">
+                <ion-icon name="close-outline"></ion-icon>
+                Отмена
+            </button>
+            <button class="btn btn-success" onclick="saveEditedTariff()">
                 <ion-icon name="save-outline"></ion-icon>
                 Сохранить
             </button>
