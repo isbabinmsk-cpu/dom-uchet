@@ -1140,6 +1140,107 @@ async function savePayment(type) {
     alert(`✓ Оплата ${type === 'electricity' ? 'электроэнергии' : 'газа'} сохранена!`);
 }
 
+// ===== РЕДАКТИРОВАНИЕ ПЛАТЕЖЕЙ =====
+let editingPaymentId = null;
+
+function editPayment(id) {
+    const payment = payments.find(p => p.id === id);
+    if (!payment) return;
+    
+    editingPaymentId = id;
+    
+    const modal = document.getElementById('edit-payment-modal');
+    if (!modal) {
+        alert('❌ Модальное окно не найдено!');
+        return;
+    }
+    
+    const title = document.getElementById('edit-payment-title');
+    if (title) {
+        const typeName = payment.type === 'electricity' ? 'Электроэнергия' : 'Газ';
+        title.innerHTML = `<ion-icon name="create-outline"></ion-icon> Редактирование платежа (${typeName})`;
+    }
+    
+    const dateInput = document.getElementById('edit-payment-date');
+    const amountInput = document.getElementById('edit-payment-amount');
+    const typeDisplay = document.getElementById('edit-payment-type-display');
+    
+    if (dateInput) dateInput.value = payment.date;
+    if (amountInput) amountInput.value = payment.amount;
+    if (typeDisplay) typeDisplay.value = payment.type === 'electricity' ? 'Электроэнергия' : 'Газ';
+    
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeEditPaymentModal() {
+    const modal = document.getElementById('edit-payment-modal');
+    if (modal) {
+        modal.classList.remove('active');
+    }
+    document.body.style.overflow = '';
+    editingPaymentId = null;
+}
+
+async function saveEditedPayment() {
+    if (!editingPaymentId) return;
+    
+    const paymentIndex = payments.findIndex(p => p.id === editingPaymentId);
+    if (paymentIndex === -1) {
+        closeEditPaymentModal();
+        return;
+    }
+    
+    const dateInput = document.getElementById('edit-payment-date');
+    const amountInput = document.getElementById('edit-payment-amount');
+    
+    const date = dateInput ? dateInput.value : '';
+    const amount = amountInput ? parseFloat(amountInput.value) : 0;
+    
+    if (!date || isNaN(amount) || amount <= 0) {
+        alert(' Заполните все поля корректно!');
+        return;
+    }
+    
+    payments[paymentIndex] = {
+        ...payments[paymentIndex],
+        date: date,
+        amount: Math.round(amount * 100) / 100,
+        updatedAt: new Date().toISOString()
+    };
+    
+    saveLocal();
+    
+    if (isFirebaseConnected) {
+        await syncPaymentToFirebase(payments[paymentIndex]);
+    }
+    
+    updatePaymentsList();
+    updatePaymentSummary();
+    updateBalanceDisplay();
+    
+    closeEditPaymentModal();
+    alert('✓ Платеж обновлен!');
+}
+
+// Закрытие модального окна по клику на оверлей
+document.addEventListener('DOMContentLoaded', () => {
+    const modal = document.getElementById('edit-payment-modal');
+    if (modal) {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeEditPaymentModal();
+            }
+        });
+    }
+    
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            closeEditPaymentModal();
+        }
+    });
+});
+
 // ===== ГЛАВНАЯ ФУНКЦИЯ ОБНОВЛЕНИЯ БАЛАНСА =====
 function updatePaymentSummary() {
     ['electricity', 'gas'].forEach(type => {
@@ -1228,24 +1329,38 @@ function filterPayments(type) {
 function updatePaymentsList() {
     const list = document.getElementById('payments-list');
     if (!list) return;
+    
     let filtered = [...payments];
-    if (currentPaymentFilter !== 'all') filtered = filtered.filter(p => p.type === currentPaymentFilter);
+    if (currentPaymentFilter !== 'all') {
+        filtered = filtered.filter(p => p.type === currentPaymentFilter);
+    }
+    
     filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
-
+    
     if (filtered.length === 0) {
         list.innerHTML = '<p class="hint-text">Нет записей об оплатах</p>';
         return;
     }
-
+    
     list.innerHTML = filtered.map(p => `
         <div class="payment-item ${p.type}">
             <div class="payment-header">
-                <span class="payment-date"><ion-icon name="calendar-outline"></ion-icon>${formatDate(p.date)}</span>
+                <span class="payment-date">
+                    <ion-icon name="calendar-outline"></ion-icon>
+                    ${formatDate(p.date)}
+                </span>
                 <span class="payment-type">${p.type === 'electricity' ? 'Электроэнергия' : 'Газ'}</span>
             </div>
-            <div class="payment-amount">${p.amount.toFixed(2)} ₽</div>
+            <div class="payment-amount">${parseFloat(p.amount).toFixed(2)} ₽</div>
             <div class="payment-actions">
-                <button class="btn btn-danger" onclick="deletePayment('${p.id}')"><ion-icon name="trash-outline"></ion-icon>Удалить</button>
+                <button class="btn btn-secondary" onclick="editPayment('${p.id}')" style="margin-right: 8px;">
+                    <ion-icon name="create-outline"></ion-icon>
+                    Редактировать
+                </button>
+                <button class="btn btn-danger" onclick="deletePayment('${p.id}')">
+                    <ion-icon name="trash-outline"></ion-icon>
+                    Удалить
+                </button>
             </div>
         </div>
     `).join('');
@@ -1310,6 +1425,8 @@ async function deleteRecord(id) {
     updatePaymentSummary();
     updateBalanceDisplay();
 }
+
+
 
 // ===== МОДАЛЬНОЕ ОКНО РЕДАКТИРОВАНИЯ =====
 let editingRecordId = null;
@@ -1679,25 +1796,51 @@ function updateAnalytics() {
     const month = document.getElementById('analytics-month')?.value;
     const year = document.getElementById('analytics-year')?.value;
     let filtered = [...records];
+    
     if (month) filtered = filtered.filter(r => (new Date(r.date).getMonth() + 1).toString() === month);
     if (year) filtered = filtered.filter(r => new Date(r.date).getFullYear().toString() === year);
-
+    
+    // Считаем в копейках для точности (как в updatePaymentSummary)
+    const electricityKopecks = filtered.filter(r => r.type === 'electricity')
+        .reduce((sum, r) => sum + Math.round((parseFloat(r.total) || 0) * 100), 0);
+    const gasKopecks = filtered.filter(r => r.type === 'gas')
+        .reduce((sum, r) => sum + Math.round((parseFloat(r.total) || 0) * 100), 0);
+    
+    // Переводим обратно в рубли
+    const electricity = electricityKopecks / 100;
+    const gas = gasKopecks / 100;
+    
     const stats = {
-        electricity: filtered.filter(r => r.type === 'electricity').reduce((sum, r) => sum + (r.total || 0), 0),
-        gas: filtered.filter(r => r.type === 'gas').reduce((sum, r) => sum + (r.total || 0), 0),
+        electricity: electricity,
+        gas: gas,
         salt: filtered.filter(r => r.type === 'salt').length,
         cartridge: filtered.filter(r => r.type === 'cartridge').length,
-        total: filtered.filter(r => ['electricity', 'gas'].includes(r.type)).reduce((sum, r) => sum + (r.total || 0), 0)
+        total: (electricityKopecks + gasKopecks) / 100
     };
 
     const statsGrid = document.getElementById('analytics-stats');
     if (statsGrid) {
         statsGrid.innerHTML = `
-            <div class="stat-card"><h3>Электроэнергия</h3><div class="stat-value">${stats.electricity.toFixed(2)} ₽</div></div>
-            <div class="stat-card"><h3>Газ</h3><div class="stat-value">${stats.gas.toFixed(2)} ₽</div></div>
-            <div class="stat-card"><h3>Засыпки соли</h3><div class="stat-value">${stats.salt} раз</div></div>
-            <div class="stat-card"><h3>Замены картриджа</h3><div class="stat-value">${stats.cartridge} раз</div></div>
-            <div class="stat-card total"><h3>Итого расходов</h3><div class="stat-value">${stats.total.toFixed(2)} ₽</div></div>
+            <div class="stat-card">
+                <h3>Электроэнергия</h3>
+                <div class="stat-value">${stats.electricity.toFixed(2)} ₽</div>
+            </div>
+            <div class="stat-card">
+                <h3>Газ</h3>
+                <div class="stat-value">${stats.gas.toFixed(2)} ₽</div>
+            </div>
+            <div class="stat-card">
+                <h3>Засыпки соли</h3>
+                <div class="stat-value">${stats.salt} раз</div>
+            </div>
+            <div class="stat-card">
+                <h3>Замены картриджа</h3>
+                <div class="stat-value">${stats.cartridge} раз</div>
+            </div>
+            <div class="stat-card total">
+                <h3>Итого расходов</h3>
+                <div class="stat-value">${stats.total.toFixed(2)} ₽</div>
+            </div>
         `;
     }
 }
@@ -2084,3 +2227,7 @@ window.recalculateAll = recalculateAll;
 window.editTariff = editTariff;
 window.closeEditTariffModal = closeEditTariffModal;
 window.saveEditedTariff = saveEditedTariff;
+// Экспорт функций редактирования платежей
+window.editPayment = editPayment;
+window.closeEditPaymentModal = closeEditPaymentModal;
+window.saveEditedPayment = saveEditedPayment;

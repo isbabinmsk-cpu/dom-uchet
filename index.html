@@ -18,7 +18,7 @@
     <script nomodule src="https://unpkg.com/ionicons@7.4.0/dist/ionicons/ionicons.js"></script>
     
     <script type="module" src="firebase-config.js?v=5.0.0"></script>
-    <script type="module" src="script.js?v=5.0.0"></script>
+    <script type="module" src="script.js?v=1.1.0"></script>
 </head>
 <body>
     <header class="top-header">
@@ -761,6 +761,64 @@
                 Отмена
             </button>
             <button class="btn btn-success" onclick="saveEditedTariff()">
+                <ion-icon name="save-outline"></ion-icon>
+                Сохранить
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно редактирования платежа -->
+<div id="edit-payment-modal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="edit-payment-title">
+                <ion-icon name="create-outline"></ion-icon>
+                Редактирование платежа
+            </h3>
+            <button class="modal-close" onclick="closeEditPaymentModal()">
+                <ion-icon name="close-outline"></ion-icon>
+            </button>
+        </div>
+        
+        <div class="modal-body">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>
+                        <ion-icon name="calendar-outline" class="form-icon"></ion-icon>
+                        Дата платежа *
+                    </label>
+                    <input type="date" id="edit-payment-date" required>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label>
+                        <ion-icon name="cash-outline" class="form-icon"></ion-icon>
+                        Сумма (₽) *
+                    </label>
+                    <input type="number" id="edit-payment-amount" step="0.01" min="0" required>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label>
+                        <ion-icon name="flash-outline" class="form-icon"></ion-icon>
+                        Тип платежа
+                    </label>
+                    <input type="text" id="edit-payment-type-display" disabled style="background: #f8f9fa;">
+                </div>
+            </div>
+        </div>
+        
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeEditPaymentModal()">
+                <ion-icon name="close-outline"></ion-icon>
+                Отмена
+            </button>
+            <button class="btn btn-success" onclick="saveEditedPayment()">
                 <ion-icon name="save-outline"></ion-icon>
                 Сохранить
             </button>
