@@ -1,3 +1,4 @@
+/* ===== БАЗОВЫЕ ПЕРЕМЕННЫЕ ===== */
 :root {
     --ios-bg: #f2f2f7;
     --ios-card: #ffffff;
@@ -16,8 +17,10 @@
     --ios-spacing-lg: 24px;
     --ios-radius: 16px;
     --nav-height: 70px;
+    --container-max: 800px;
 }
 
+/* ===== СБРОС СТИЛЕЙ ===== */
 * {
     margin: 0;
     padding: 0;
@@ -30,10 +33,11 @@ body {
     color: var(--ios-text-primary);
     padding-bottom: calc(var(--nav-height) + 20px);
     min-height: 100vh;
+    overflow-x: hidden;
 }
 
 .container {
-    max-width: 800px;
+    max-width: var(--container-max);
     margin: 0 auto;
     padding: var(--ios-spacing-md);
 }
@@ -47,7 +51,8 @@ body {
     position: sticky;
     top: 0;
     z-index: 100;
-    border-bottom: 0.5px solid var(--ios-border);}
+    border-bottom: 0.5px solid var(--ios-border);
+}
 
 .top-header h1 {
     font-size: 28px;
@@ -97,6 +102,7 @@ body {
     border-bottom: none;
     margin-bottom: 0;
 }
+
 .form-section h3 {
     font-size: 18px;
     font-weight: 600;
@@ -145,7 +151,8 @@ body {
 input, select {
     width: 100%;
     padding: 14px;
-    border: 1.5px solid var(--ios-border);    border-radius: 10px;
+    border: 1.5px solid var(--ios-border);
+    border-radius: 10px;
     font-size: 16px;
     background: var(--ios-card);
     transition: all 0.2s;
@@ -194,7 +201,8 @@ input:focus, select:focus {
     font-weight: 600;
     cursor: pointer;
     display: inline-flex;
-    align-items: center;    justify-content: center;
+    align-items: center;
+    justify-content: center;
     gap: 8px;
     transition: all 0.2s;
     font-family: inherit;
@@ -212,6 +220,11 @@ input:focus, select:focus {
 
 .btn-danger {
     background: var(--ios-danger);
+    color: white;
+}
+
+.btn-primary {
+    background: var(--ios-accent);
     color: white;
 }
 
@@ -243,7 +256,8 @@ input:focus, select:focus {
 }
 
 .import-wrapper {
-    position: relative;    flex: 1;
+    position: relative;
+    flex: 1;
 }
 
 .import-wrapper input[type="file"] {
@@ -273,6 +287,34 @@ input:focus, select:focus {
     z-index: 1000;
     max-width: 95vw;
     overflow-x: auto;
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+    transition: box-shadow 0.3s, transform 0.1s;
+}
+
+.floating-nav.dragging {
+    cursor: grabbing;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25), 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateX(-50%) scale(1.05);
+    z-index: 1001;
+}
+
+.floating-nav.dragging .nav-btn {
+    pointer-events: none;
+}
+
+.floating-nav::before {
+    content: '⠿';
+    position: absolute;
+    top: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 14px;
+    color: var(--ios-text-tertiary);
+    opacity: 0.6;
+    pointer-events: none;
 }
 
 .nav-btn {
@@ -289,10 +331,12 @@ input:focus, select:focus {
     border-radius: 16px;
     min-width: 60px;
     font-family: inherit;
+    pointer-events: auto;
 }
 
 .nav-btn ion-icon {
-    font-size: 24px;    transition: all 0.3s;
+    font-size: 24px;
+    transition: all 0.3s;
 }
 
 .nav-btn span {
@@ -341,7 +385,8 @@ input:focus, select:focus {
 }
 
 .filter-tab {
-    padding: 10px 18px;    border: 1.5px solid var(--ios-border);
+    padding: 10px 18px;
+    border: 1.5px solid var(--ios-border);
     border-radius: 20px;
     background: white;
     cursor: pointer;
@@ -390,7 +435,8 @@ input:focus, select:focus {
 
 .history-header {
     display: flex;
-    justify-content: space-between;    align-items: center;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 10px;
 }
 
@@ -439,7 +485,8 @@ input:focus, select:focus {
 }
 
 .history-actions button {
-    flex: 1;    padding: 10px;
+    flex: 1;
+    padding: 10px;
     font-size: 14px;
 }
 
@@ -488,7 +535,8 @@ input:focus, select:focus {
     font-weight: 600;
     margin-bottom: var(--ios-spacing-md);
     display: flex;
-    align-items: center;    gap: 8px;
+    align-items: center;
+    gap: 8px;
 }
 
 .tariffs-list {
@@ -537,7 +585,8 @@ input:focus, select:focus {
     gap: 6px;
 }
 
-.tariff-actions {    margin-top: 12px;
+.tariff-actions {
+    margin-top: 12px;
 }
 
 .tariff-actions .btn {
@@ -586,10 +635,224 @@ input:focus, select:focus {
 }
 
 .stat-card.total h3 {
-    color: rgba(255, 255, 255, 0.8);}
+    color: rgba(255, 255, 255, 0.8);
+}
 
 .stat-card.total .stat-value {
     color: white;
+}
+
+/* ===== РАСШИРЕННАЯ АНАЛИТИКА ===== */
+.analytics-filters {
+    margin-bottom: 20px;
+    padding: 16px;
+    background: #f8f9fa;
+    border-radius: 12px;
+}
+
+.analytics-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.summary-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    color: white;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.summary-card.total {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.summary-card.electricity {
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+}
+
+.summary-card.gas {
+    background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+}
+
+.summary-icon {
+    font-size: 32px;
+    margin-bottom: 8px;
+}
+
+.summary-label {
+    font-size: 14px;
+    opacity: 0.9;
+    margin-bottom: 8px;
+}
+
+.summary-value {
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.analytics-details,
+.analytics-monthly,
+.analytics-comparison,
+.analytics-payments {
+    margin-bottom: 24px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 12px;
+}
+
+.analytics-details h3,
+.analytics-monthly h3,
+.analytics-comparison h3,
+.analytics-payments h3 {
+    margin: 0 0 16px 0;
+    font-size: 18px;
+    color: var(--ios-text-primary);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 12px;
+}
+
+.stat-item {
+    background: white;
+    padding: 16px;
+    border-radius: 10px;
+    border-left: 4px solid var(--ios-accent);
+}
+
+.stat-label {
+    font-size: 13px;
+    color: var(--ios-text-secondary);
+    margin-bottom: 6px;
+}
+
+.stat-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--ios-text-primary);
+}
+
+.monthly-breakdown {
+    display: grid;
+    gap: 12px;
+}
+
+.monthly-item {
+    background: white;
+    padding: 16px;
+    border-radius: 10px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+    align-items: center;
+}
+
+.monthly-month {
+    font-weight: 600;
+    color: var(--ios-text-primary);
+}
+
+.monthly-electricity,
+.monthly-gas {
+    text-align: right;
+}
+
+.monthly-value {
+    font-weight: 700;
+    color: var(--ios-accent);
+}
+
+.comparison-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.comparison-tab {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    background: white;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.comparison-tab.active {
+    background: var(--ios-accent);
+    color: white;
+}
+
+.comparison-content {
+    background: white;
+    padding: 16px;
+    border-radius: 10px;
+}
+
+.comparison-period {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--ios-border);
+}
+
+.comparison-period:last-child {
+    border-bottom: none;
+}
+
+.comparison-label {
+    font-weight: 600;
+}
+
+.comparison-value {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.comparison-diff {
+    font-size: 14px;
+    margin-left: 12px;
+}
+
+.comparison-diff.positive {
+    color: var(--ios-success);
+}
+
+.comparison-diff.negative {
+    color: var(--ios-danger);
+}
+
+.payment-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.payment-stat {
+    background: white;
+    padding: 16px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.payment-label {
+    font-size: 13px;
+    color: var(--ios-text-secondary);
+    margin-bottom: 8px;
+}
+
+.payment-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--ios-accent);
 }
 
 /* ===== СИНХРОНИЗАЦИЯ ===== */
@@ -635,82 +898,7 @@ input:focus, select:focus {
     font-style: italic;
     margin-top: 16px;
     text-align: center;
-    line-height: 1.5;}
-
-/* ===== АДАПТИВНОСТЬ ===== */
-@media (max-width: 600px) {
-    .top-header h1 {
-        font-size: 22px;
-    }
-    
-    .header-icon {
-        font-size: 26px;
-    }
-    
-    .card {
-        padding: var(--ios-spacing-md);
-    }
-    
-    .card h2 {
-        font-size: 20px;
-    }
-    
-    .form-row.two-columns {
-        grid-template-columns: 1fr;
-    }
-    
-    .stats-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .form-actions {
-        flex-direction: column;
-    }
-    
-    .form-actions .btn {
-        width: 100%;
-    }
-    
-    .history-values {
-        grid-template-columns: 1fr;
-    }
-    
-    .tariff-values {
-        grid-template-columns: 1fr;
-    }
-    
-    .floating-nav {
-        bottom: 10px;
-        padding: 6px 8px;
-        gap: 2px;
-    }
-        .nav-btn {
-        padding: 8px 12px;
-        min-width: 50px;
-    }
-    
-    .nav-btn ion-icon {
-        font-size: 20px;
-    }
-    
-    .nav-btn span {
-        font-size: 10px;
-    }
-    
-    .period-selector {
-        grid-template-columns: 1fr;
-    }
-}
-
-@media (max-width: 360px) {
-    .floating-nav {
-        bottom: 5px;
-    }
-    
-    .nav-btn {
-        padding: 6px 10px;
-        min-width: 45px;
-    }
+    line-height: 1.5;
 }
 
 /* ===== ПЕРЕКЛЮЧАТЕЛЬ ТИПА ЗАПИСИ ===== */
@@ -763,28 +951,6 @@ input:focus, select:focus {
 
 .input-form.active {
     display: block;
-}
-
-/* Адаптивность для переключателя */
-@media (max-width: 480px) {
-    .type-selector {
-        grid-template-columns: 1fr;
-    }
-    
-    .type-btn {
-        flex-direction: row;
-        justify-content: flex-start;
-        padding: 12px 16px;
-        gap: 12px;
-    }
-    
-    .type-btn ion-icon {
-        font-size: 24px;
-    }
-    
-    .type-btn span {
-        font-size: 15px;
-    }
 }
 
 /* ===== ПЕРЕКЛЮЧАТЕЛЬ ТИПА ТАРИФА ===== */
@@ -888,7 +1054,8 @@ input:focus, select:focus {
 }
 
 .payment-form.active {
-    display: block;}
+    display: block;
+}
 
 /* ===== БАЛАНС ===== */
 .balance-display {
@@ -937,6 +1104,7 @@ input:focus, select:focus {
 .balance-total.overpayment strong {
     color: var(--ios-success);
 }
+
 /* ===== ВКЛАДКА ОПЛАТЫ ===== */
 .balance-summary {
     display: grid;
@@ -987,6 +1155,7 @@ input:focus, select:focus {
     justify-content: space-between;
     font-size: 14px;
 }
+
 .balance-row span {
     color: var(--ios-text-secondary);
 }
@@ -1036,6 +1205,7 @@ input:focus, select:focus {
 .payment-item.electricity {
     border-left-color: var(--ios-warning);
 }
+
 .payment-item.gas {
     border-left-color: var(--ios-warning);
 }
@@ -1079,354 +1249,6 @@ input:focus, select:focus {
     flex: 1;
     padding: 10px;
     font-size: 14px;
-}
-
-/* Адаптивность */
-@media (max-width: 600px) {
-    .balance-summary {
-        grid-template-columns: 1fr;    }
-    
-    .payment-type-selector {
-        flex-direction: column;
-    }
-}
-
-.btn-primary {
-    background: var(--ios-accent);
-    color: white;
-}
-
-/* ===== ПЛАВАЮЩЕЕ ПЕРЕТАСКИВАЕМОЕ МЕНЮ ===== */
-.floating-nav {
-    position: fixed;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: var(--ios-blur);
-    -webkit-backdrop-filter: var(--ios-blur);
-    border-radius: 24px;
-    padding: 8px 12px;
-    display: flex;
-    gap: 4px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), 0 2px 8px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
-    max-width: 95vw;
-    overflow-x: auto;
-    cursor: grab;
-    user-select: none;
-    -webkit-user-select: none;
-    touch-action: none;
-    transition: box-shadow 0.3s, transform 0.1s;
-    /* Начальная позиция - будет установлена через JS */
-    left: 50%;
-    bottom: 20px;
-    transform: translateX(-50%);
-}
-
-.floating-nav.dragging {
-    cursor: grabbing;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25), 0 4px 12px rgba(0, 0, 0, 0.15);
-    transform: translateX(-50%) scale(1.05);
-    z-index: 1001;
-}
-
-.floating-nav.dragging .nav-btn {
-    pointer-events: none;
-}
-
-/* Индикатор перетаскивания */
-.floating-nav::before {
-    content: '⠿';
-    position: absolute;
-    top: -18px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 14px;
-    color: var(--ios-text-tertiary);
-    opacity: 0.6;
-    pointer-events: none;
-}
-
-.nav-btn {    background: none;
-    border: none;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    padding: 10px 16px;
-    cursor: pointer;
-    color: var(--ios-text-tertiary);
-    transition: all 0.3s;
-    border-radius: 16px;
-    min-width: 60px;
-    font-family: inherit;
-    pointer-events: auto;
-}
-
-.nav-btn ion-icon {
-    font-size: 24px;
-    transition: all 0.3s;
-}
-
-.nav-btn span {
-    font-size: 11px;
-    font-weight: 600;
-    transition: all 0.3s;
-}
-
-.nav-btn.active {
-    background: var(--ios-accent);
-    color: white;
-    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
-}
-
-.nav-btn.active ion-icon {
-    transform: scale(1.1);
-}
-
-/* Адаптивность */
-@media (max-width: 600px) {
-    .floating-nav {
-        padding: 6px 8px;
-        gap: 2px;
-    }
-    
-    .nav-btn {
-        padding: 8px 12px;
-        min-width: 50px;
-    }
-    
-    .nav-btn ion-icon {        font-size: 20px;
-    }
-    
-    .nav-btn span {
-        font-size: 10px;
-    }
-}
-
-@media (max-width: 360px) {
-    .nav-btn {
-        padding: 6px 10px;
-        min-width: 45px;
-    }
-}
-
-/* ===== МОДАЛЬНОЕ ОКНО РЕДАКТИРОВАНИЯ ===== */
-.modal-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-    z-index: 2000;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    animation: fadeIn 0.2s ease;
-}
-
-.modal-overlay.active {
-    display: flex;
-}
-
-.modal-content {
-    background: var(--ios-card);
-    border-radius: 16px;
-    width: 100%;
-    max-width: 500px;
-    max-height: 85vh;
-    overflow-y: auto;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    animation: slideUp 0.3s ease;
-}
-
-@keyframes slideUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px) scale(0.95);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-}
-
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px 24px;
-    border-bottom: 1px solid var(--ios-border);    position: sticky;
-    top: 0;
-    background: var(--ios-card);
-    border-radius: 16px 16px 0 0;
-    z-index: 1;
-}
-
-.modal-header h3 {
-    font-size: 20px;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin: 0;
-}
-
-.modal-header h3 ion-icon {
-    font-size: 24px;
-    color: var(--ios-accent);
-}
-
-.modal-close {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 8px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.2s;
-}
-
-.modal-close ion-icon {
-    font-size: 24px;
-    color: var(--ios-text-secondary);
-}
-
-.modal-close:hover {
-    background: rgba(0, 0, 0, 0.05);
-}
-
-.modal-body {
-    padding: 24px;
-}
-
-.modal-body .form-group {
-    margin-bottom: 16px;
-}
-.modal-body .form-group label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--ios-text-secondary);
-    margin-bottom: 8px;
-}
-
-.modal-body .form-group label ion-icon {
-    font-size: 20px;
-}
-
-.modal-body input,
-.modal-body select {
-    width: 100%;
-    padding: 12px 14px;
-    border: 1.5px solid var(--ios-border);
-    border-radius: 10px;
-    font-size: 16px;
-    background: var(--ios-bg);
-    transition: all 0.2s;
-    font-family: inherit;
-}
-
-.modal-body input:focus {
-    outline: none;
-    border-color: var(--ios-accent);
-    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
-}
-
-.modal-body .form-row {
-    margin-bottom: 16px;
-}
-
-.modal-body .form-row.two-columns {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-}
-
-.modal-body .calc-results {
-    background: #f8f9fa;
-    border-radius: 10px;
-    padding: 14px;
-    margin-top: 12px;
-}
-
-.modal-body .calc-item {    display: flex;
-    justify-content: space-between;
-    padding: 8px 0;
-    border-bottom: 1px solid var(--ios-border);
-    font-size: 14px;
-}
-
-.modal-body .calc-item:last-child {
-    border-bottom: none;
-}
-
-.modal-body .calc-item.total {
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--ios-accent);
-}
-
-.modal-footer {
-    display: flex;
-    gap: 12px;
-    padding: 16px 24px;
-    border-top: 1px solid var(--ios-border);
-    position: sticky;
-    bottom: 0;
-    background: var(--ios-card);
-    border-radius: 0 0 16px 16px;
-}
-
-.modal-footer .btn {
-    flex: 1;
-    justify-content: center;
-}
-
-/* Адаптивность модального окна */
-@media (max-width: 480px) {
-    .modal-overlay {
-        padding: 10px;
-        align-items: flex-end;
-    }
-    
-    .modal-content {
-        max-height: 90vh;
-        border-radius: 16px 16px 0 0;
-        animation: slideUpMobile 0.3s ease;
-    }
-    
-    @keyframes slideUpMobile {
-        from {
-            opacity: 0;
-            transform: translateY(100%);        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
-    .modal-header {
-        padding: 16px 20px;
-    }
-    
-    .modal-body {
-        padding: 20px;
-    }
-    
-    .modal-footer {
-        padding: 12px 20px;
-    }
-    
-    .modal-body .form-row.two-columns {
-        grid-template-columns: 1fr;
-    }
 }
 
 /* ===== МОДАЛЬНОЕ ОКНО РЕДАКТИРОВАНИЯ ===== */
@@ -1612,8 +1434,207 @@ input:focus, select:focus {
     justify-content: center;
 }
 
-/* Адаптивность модального окна */
-@media (max-width: 480px) {
+/* ===== АДАПТИВНОСТЬ ===== */
+
+/* Большие мониторы (1440px+) */
+@media (min-width: 1440px) {
+    :root {
+        --container-max: 1200px;
+    }
+    
+    .container {
+        padding: var(--ios-spacing-lg);
+    }
+    
+    .card {
+        padding: 32px;
+    }
+    
+    .top-header h1 {
+        font-size: 32px;
+    }
+    
+    .header-icon {
+        font-size: 36px;
+    }
+    
+    .card h2 {
+        font-size: 28px;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+    
+    .analytics-summary {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .payment-stats {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* Средние мониторы (1200px - 1439px) */
+@media (min-width: 1200px) and (max-width: 1439px) {
+    :root {
+        --container-max: 1000px;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .analytics-summary {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* Маленькие мониторы и планшеты в альбомной ориентации (1024px - 1199px) */
+@media (min-width: 1024px) and (max-width: 1199px) {
+    :root {
+        --container-max: 900px;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .analytics-summary {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Планшеты (768px - 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+    :root {
+        --container-max: 700px;
+    }
+    
+    .container {
+        padding: var(--ios-spacing-md);
+    }
+    
+    .top-header h1 {
+        font-size: 24px;
+    }
+    
+    .header-icon {
+        font-size: 28px;
+    }
+    
+    .card {
+        padding: var(--ios-spacing-md);
+    }
+    
+    .card h2 {
+        font-size: 22px;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .analytics-summary {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .payment-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .monthly-item {
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+}
+
+/* Большие телефоны (600px - 767px) */
+@media (max-width: 767px) {
+    .top-header h1 {
+        font-size: 22px;
+    }
+    
+    .header-icon {
+        font-size: 26px;
+    }
+    
+    .card {
+        padding: var(--ios-spacing-md);
+    }
+    
+    .card h2 {
+        font-size: 20px;
+    }
+    
+    .form-row.two-columns {
+        grid-template-columns: 1fr;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .form-actions .btn {
+        width: 100%;
+    }
+    
+    .history-values {
+        grid-template-columns: 1fr;
+    }
+    
+    .tariff-values {
+        grid-template-columns: 1fr;
+    }
+    
+    .floating-nav {
+        bottom: 10px;
+        padding: 6px 8px;
+        gap: 2px;
+    }
+    
+    .nav-btn {
+        padding: 8px 12px;
+        min-width: 50px;
+    }
+    
+    .nav-btn ion-icon {
+        font-size: 20px;
+    }
+    
+    .nav-btn span {
+        font-size: 10px;
+    }
+    
+    .period-selector {
+        grid-template-columns: 1fr;
+    }
+    
+    .analytics-summary {
+        grid-template-columns: 1fr;
+    }
+    
+    .monthly-item {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+    
+    .monthly-electricity,
+    .monthly-gas {
+        text-align: center;
+    }
+    
+    .balance-summary {
+        grid-template-columns: 1fr;
+    }
+    
+    .payment-type-selector {
+        flex-direction: column;
+    }
+    
     .modal-overlay {
         padding: 10px;
         align-items: flex-end;
@@ -1650,5 +1671,734 @@ input:focus, select:focus {
     
     .modal-body .form-row.two-columns {
         grid-template-columns: 1fr;
+    }
+}
+
+/* Средние телефоны (480px - 599px) */
+@media (max-width: 599px) {
+    .type-selector {
+        grid-template-columns: 1fr;
+    }
+    
+    .type-btn {
+        flex-direction: row;
+        justify-content: flex-start;
+        padding: 12px 16px;
+        gap: 12px;
+    }
+    
+    .type-btn ion-icon {
+        font-size: 24px;
+    }
+    
+    .type-btn span {
+        font-size: 15px;
+    }
+    
+    .floating-nav {
+        bottom: 8px;
+        padding: 6px 8px;
+        gap: 2px;
+    }
+    
+    .nav-btn {
+        padding: 8px 10px;
+        min-width: 48px;
+    }
+    
+    .nav-btn ion-icon {
+        font-size: 20px;
+    }
+    
+    .nav-btn span {
+        font-size: 9px;
+    }
+    
+    .history-actions {
+        flex-direction: column;
+    }
+    
+    .history-actions button {
+        width: 100%;
+    }
+    
+    .payment-actions {
+        flex-direction: column;
+    }
+    
+    .payment-actions button {
+        width: 100%;
+    }
+    
+    .tariff-actions .btn {
+        width: 100%;
+    }
+    
+    .comparison-period {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .comparison-diff {
+        margin-left: 0;
+    }
+}
+
+/* Маленькие телефоны (375px - 479px) */
+@media (max-width: 479px) {
+    :root {
+        --ios-spacing-md: 12px;
+        --ios-spacing-lg: 16px;
+    }
+    
+    .container {
+        padding: var(--ios-spacing-sm);
+    }
+    
+    .top-header {
+        padding: var(--ios-spacing-sm);
+    }
+    
+    .top-header h1 {
+        font-size: 20px;
+        gap: 8px;
+    }
+    
+    .header-icon {
+        font-size: 24px;
+    }
+    
+    .card {
+        padding: var(--ios-spacing-sm);
+        border-radius: 12px;
+    }
+    
+    .card h2 {
+        font-size: 18px;
+        margin-bottom: var(--ios-spacing-md);
+    }
+    
+    .section-icon {
+        font-size: 24px;
+    }
+    
+    .form-section h3 {
+        font-size: 16px;
+    }
+    
+    .form-group label {
+        font-size: 13px;
+    }
+    
+    input, select {
+        padding: 12px;
+        font-size: 15px;
+    }
+    
+    .btn {
+        padding: 12px 16px;
+        font-size: 15px;
+    }
+    
+    .floating-nav {
+        bottom: 5px;
+        padding: 5px 6px;
+        gap: 1px;
+        border-radius: 20px;
+    }
+    
+    .nav-btn {
+        padding: 6px 8px;
+        min-width: 44px;
+        gap: 2px;
+    }
+    
+    .nav-btn ion-icon {
+        font-size: 18px;
+    }
+    
+    .nav-btn span {
+        font-size: 8px;
+    }
+    
+    .history-item {
+        padding: var(--ios-spacing-sm);
+    }
+    
+    .history-date {
+        font-size: 14px;
+    }
+    
+    .history-type {
+        font-size: 11px;
+    }
+    
+    .history-values {
+        font-size: 13px;
+    }
+    
+    .history-total {
+        font-size: 16px;
+    }
+    
+    .tariff-item {
+        padding: var(--ios-spacing-sm);
+    }
+    
+    .tariff-date {
+        font-size: 14px;
+    }
+    
+    .tariff-values {
+        font-size: 13px;
+    }
+    
+    .payment-item {
+        padding: var(--ios-spacing-sm);
+    }
+    
+    .payment-date {
+        font-size: 14px;
+    }
+    
+    .payment-amount {
+        font-size: 18px;
+    }
+    
+    .summary-value {
+        font-size: 24px;
+    }
+    
+    .summary-icon {
+        font-size: 28px;
+    }
+    
+    .summary-label {
+        font-size: 13px;
+    }
+    
+    .stat-value {
+        font-size: 18px;
+    }
+    
+    .stat-label {
+        font-size: 12px;
+    }
+    
+    .monthly-item {
+        padding: 12px;
+    }
+    
+    .monthly-month {
+        font-size: 14px;
+    }
+    
+    .monthly-value {
+        font-size: 14px;
+    }
+    
+    .comparison-tab {
+        padding: 10px;
+        font-size: 14px;
+    }
+    
+    .comparison-value {
+        font-size: 16px;
+    }
+    
+    .payment-value {
+        font-size: 20px;
+    }
+    
+    .modal-header {
+        padding: 14px 16px;
+    }
+    
+    .modal-header h3 {
+        font-size: 18px;
+    }
+    
+    .modal-body {
+        padding: 16px;
+    }
+    
+    .modal-footer {
+        padding: 12px 16px;
+    }
+}
+
+/* Очень маленькие телефоны (до 374px) */
+@media (max-width: 374px) {
+    :root {
+        --ios-spacing-md: 10px;
+        --ios-spacing-lg: 14px;
+    }
+    
+    .container {
+        padding: 8px;
+    }
+    
+    .top-header h1 {
+        font-size: 18px;
+    }
+    
+    .header-icon {
+        font-size: 22px;
+    }
+    
+    .card {
+        padding: 12px;
+        border-radius: 10px;
+    }
+    
+    .card h2 {
+        font-size: 16px;
+    }
+    
+    .floating-nav {
+        bottom: 3px;
+        padding: 4px 5px;
+        gap: 1px;
+        border-radius: 18px;
+    }
+    
+    .nav-btn {
+        padding: 5px 6px;
+        min-width: 40px;
+    }
+    
+    .nav-btn ion-icon {
+        font-size: 16px;
+    }
+    
+    .nav-btn span {
+        font-size: 7px;
+    }
+    
+    .form-group label {
+        font-size: 12px;
+    }
+    
+    input, select {
+        padding: 10px;
+        font-size: 14px;
+    }
+    
+    .btn {
+        padding: 10px 12px;
+        font-size: 14px;
+    }
+    
+    .history-item,
+    .tariff-item,
+    .payment-item {
+        padding: 10px;
+    }
+    
+    .summary-card {
+        padding: 16px;
+    }
+    
+    .summary-value {
+        font-size: 20px;
+    }
+    
+    .modal-content {
+        max-height: 95vh;
+    }
+}
+
+/* Альбомная ориентация на телефонах */
+@media (max-height: 500px) and (orientation: landscape) {
+    .floating-nav {
+        bottom: 5px;
+        padding: 4px 8px;
+    }
+    
+    .nav-btn {
+        padding: 6px 10px;
+    }
+    
+    .nav-btn span {
+        display: none;
+    }
+    
+    .modal-overlay {
+        align-items: center;
+    }
+    
+    .modal-content {
+        max-height: 90vh;
+        border-radius: 12px;
+    }
+}
+
+/* Печать */
+@media print {
+    .floating-nav,
+    .modal-overlay,
+    .btn,
+    .form-actions {
+        display: none !important;
+    }
+    
+    body {
+        background: white;
+        padding: 0;
+    }
+    
+    .container {
+        max-width: 100%;
+    }
+    
+    .card {
+        box-shadow: none;
+        border: 1px solid #ddd;
+        break-inside: avoid;
+    }
+}
+
+/* Высокий контраст */
+@media (prefers-contrast: high) {
+    :root {
+        --ios-border: rgba(0, 0, 0, 0.3);
+        --ios-text-secondary: #000000;
+    }
+    
+    .btn {
+        border: 2px solid currentColor;
+    }
+}
+
+/* Уменьшенное движение */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Тёмная тема */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --ios-bg: #000000;
+        --ios-card: #1c1c1e;
+        --ios-text-primary: #ffffff;
+        --ios-text-secondary: #ebebf5;
+        --ios-text-tertiary: #8e8e93;
+        --ios-border: rgba(255, 255, 255, 0.1);
+    }
+    
+    .card {
+        background: var(--ios-card);
+    }
+    
+    .form-section {
+        border-bottom-color: var(--ios-border);
+    }
+    
+    input, select {
+        background: var(--ios-card);
+        color: var(--ios-text-primary);
+    }
+    
+    .calc-results,
+    .tariff-item,
+    .history-item,
+    .payment-item {
+        background: #2c2c2e;
+    }
+    
+    .filter-tab {
+        background: var(--ios-card);
+        color: var(--ios-text-primary);
+    }
+    
+    .type-btn,
+    .tariff-type-btn,
+    .payment-type-btn {
+        background: var(--ios-card);
+        color: var(--ios-text-primary);
+    }
+    
+    .modal-content {
+        background: var(--ios-card);
+    }
+    
+    .modal-body input,
+    .modal-body select {
+        background: #2c2c2e;
+        color: var(--ios-text-primary);
+    }
+}
+
+/* ===== УЛУЧШЕННОЕ ОТОБРАЖЕНИЕ ТАРИФОВ ===== */
+.tariff-item {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 16px;
+    border-left: 5px solid var(--ios-success);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+}
+
+.tariff-item:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+}
+
+.tariff-item.current {
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+    border-left-color: var(--ios-success);
+    border-left-width: 6px;
+}
+
+.tariff-date {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: var(--ios-text-primary);
+}
+
+.tariff-date ion-icon {
+    font-size: 24px;
+    color: var(--ios-accent);
+}
+
+.tariff-date .current-badge {
+    background: var(--ios-success);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-left: auto;
+}
+
+.tariff-section {
+    margin-bottom: 16px;
+    padding: 12px;
+    border-radius: 12px;
+}
+
+.tariff-section.normal {
+    background: #f8f9fa;
+    border-left: 3px solid var(--ios-warning);
+}
+
+.tariff-section.over {
+    background: #fff3cd;
+    border-left: 3px solid var(--ios-danger);
+}
+
+.tariff-section-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ios-text-secondary);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.tariff-section-title ion-icon {
+    font-size: 16px;
+}
+
+.tariff-values-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.tariff-value-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    background: white;
+    border-radius: 8px;
+}
+
+.tariff-value-item ion-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.tariff-value-item .t1-icon {
+    color: var(--ios-warning);
+}
+
+.tariff-value-item .t2-icon {
+    color: var(--ios-accent);
+}
+
+.tariff-value-item .gas-icon {
+    color: var(--ios-warning);
+}
+
+.tariff-value-label {
+    font-size: 12px;
+    color: var(--ios-text-tertiary);
+    font-weight: 500;
+}
+
+.tariff-value-amount {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ios-text-primary);
+}
+
+.tariff-value-item.over .tariff-value-amount {
+    color: var(--ios-danger);
+}
+
+.tariff-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+.tariff-actions .btn {
+    flex: 1;
+    padding: 10px;
+    font-size: 14px;
+}
+
+/* Иконки типов тарифов */
+.tariff-type-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    margin-right: 8px;
+}
+
+.tariff-type-icon.electricity {
+    background: rgba(255, 149, 0, 0.1);
+    color: var(--ios-warning);
+}
+
+.tariff-type-icon.gas {
+    background: rgba(255, 149, 0, 0.1);
+    color: var(--ios-warning);
+}
+
+.tariff-type-icon ion-icon {
+    font-size: 20px;
+}
+
+/* Заголовки секций */
+.tariffs-section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 20px;
+    font-weight: 700;
+    margin: 24px 0 16px 0;
+    color: var(--ios-text-primary);
+}
+
+.tariffs-section-title ion-icon {
+    font-size: 24px;
+}
+
+.tariffs-section-title.electricity {
+    color: var(--ios-warning);
+}
+
+.tariffs-section-title.gas {
+    color: var(--ios-warning);
+}
+
+/* Адаптивность */
+@media (max-width: 600px) {
+    .tariff-item {
+        padding: 16px;
+    }
+    
+    .tariff-date {
+        font-size: 16px;
+    }
+    
+    .tariff-values-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .tariff-value-item {
+        padding: 10px;
+    }
+    
+    .tariff-actions {
+        flex-direction: column;
+    }
+}
+
+/* ===== ЗАГОЛОВКИ СЕКЦИЙ ТАРИФОВ ===== */
+.tariff-section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    margin: 24px 0 16px 0;
+    border-radius: 14px;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.tariff-section-header:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+.tariff-section-header ion-icon {
+    font-size: 28px;
+}
+
+/* Электроэнергия - оранжевый */
+.tariff-section-header.electricity {
+    background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+    color: #e65100;
+    border-left: 5px solid #ff9800;
+}
+
+.tariff-section-header.electricity ion-icon {
+    color: #ff9800;
+}
+
+/* Газ - синий */
+.tariff-section-header.gas {
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    color: #0d47a1;
+    border-left: 5px solid #2196f3;
+}
+
+.tariff-section-header.gas ion-icon {
+    color: #2196f3;
+}
+
+/* Адаптивность */
+@media (max-width: 480px) {
+    .tariff-section-header {
+        font-size: 18px;
+        padding: 12px 16px;
+        margin: 18px 0 12px 0;
+    }
+    
+    .tariff-section-header ion-icon {
+        font-size: 24px;
     }
 }

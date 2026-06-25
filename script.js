@@ -20,6 +20,7 @@ let currentPaymentFilter = 'all';
 let currentInputType = 'electricity';
 let currentTariffType = 'electricity';
 let isFirebaseConnected = false;
+let currentPaymentType = 'all'; // 'all', 'electricity', 'gas'
 
 // ===== ИНИЦИАЛИЗАЦИЯ =====
 document.addEventListener('DOMContentLoaded', async () => {
@@ -681,11 +682,6 @@ function autoFillOverTariffs() {
     }
 }
 
-// Экспорт функции
-window.autoFillOverTariffs = autoFillOverTariffs;
-
-// Экспорт функции
-window.autoFillOverTariffs = autoFillOverTariffs;
 
 // Экспорт функции
 window.autoFillOverTariffs = autoFillOverTariffs;
@@ -703,8 +699,7 @@ function updateTariffList() {
             elecList.innerHTML = sortedElec.map(t => {
                 const isCurrent = currentElecTariff && t.id === currentElecTariff.id;
                 
-                // Используем ?? вместо || чтобы 0 отображался корректно
-                // Округляем до 2 знаков
+                // Округляем повышенные тарифы
                 const displayOverT1 = (t.overT1 !== undefined && t.overT1 !== null) 
                     ? t.overT1 
                     : Math.round((parseFloat(t.t1) + 0.01) * 100) / 100;
@@ -717,39 +712,57 @@ function updateTariffList() {
                         <div class="tariff-date">
                             <ion-icon name="calendar-outline"></ion-icon>
                             ${formatDate(t.date)}
-                            ${isCurrent ? '<span style="color: var(--ios-success); font-weight: bold; margin-left: 8px;">(действует)</span>' : ''}
+                            ${isCurrent ? '<span class="current-badge">(действует)</span>' : ''}
                         </div>
-                        <div class="tariff-values">
-                            <div style="margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid var(--ios-border);">
-                                <div style="font-weight: 600; color: var(--ios-text-secondary); font-size: 13px; margin-bottom: 4px;">
-                                    Обычные тарифы:
-                                </div>
-                                <div>
-                                    <ion-icon name="sunny-outline" style="color: var(--ios-warning);"></ion-icon>
-                                    Т1: ${parseFloat(t.t1).toFixed(2)} ₽/кВт·ч
-                                </div>
-                                <div>
-                                    <ion-icon name="moon-outline" style="color: var(--ios-accent);"></ion-icon>
-                                    Т2: ${parseFloat(t.t2 || 0).toFixed(2)} ₽/кВт·ч
-                                </div>
+                        
+                        <div class="tariff-section normal">
+                            <div class="tariff-section-title">
+                                <ion-icon name="flash-outline" style="color: var(--ios-warning);"></ion-icon>
+                                Обычные тарифы
                             </div>
-                            <div>
-                                <div style="font-weight: 600; color: var(--ios-danger); font-size: 13px; margin-bottom: 4px;">
-                                    <ion-icon name="trending-up-outline"></ion-icon>
-                                    Повышенные (сверх 3000 кВт·ч):
+                            <div class="tariff-values-grid">
+                                <div class="tariff-value-item">
+                                    <ion-icon name="sunny-outline" class="t1-icon"></ion-icon>
+                                    <div>
+                                        <div class="tariff-value-label">Т1 (день)</div>
+                                        <div class="tariff-value-amount">${parseFloat(t.t1).toFixed(2)} ₽/кВт·ч</div>
+                                    </div>
                                 </div>
-                                <div style="color: var(--ios-danger);">
-                                    <ion-icon name="sunny-outline"></ion-icon>
-                                    Т1: ${parseFloat(displayOverT1).toFixed(2)} ₽/кВт·ч
-                                </div>
-                                <div style="color: var(--ios-danger);">
-                                    <ion-icon name="moon-outline"></ion-icon>
-                                    Т2: ${parseFloat(displayOverT2).toFixed(2)} ₽/кВт·ч
+                                <div class="tariff-value-item">
+                                    <ion-icon name="moon-outline" class="t2-icon"></ion-icon>
+                                    <div>
+                                        <div class="tariff-value-label">Т2 (ночь)</div>
+                                        <div class="tariff-value-amount">${parseFloat(t.t2 || 0).toFixed(2)} ₽/кВт·ч</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                        
+                        <div class="tariff-section over">
+                            <div class="tariff-section-title">
+                                <ion-icon name="trending-up-outline" style="color: var(--ios-danger);"></ion-icon>
+                                Повышенные (сверх 3000 кВт·ч)
+                            </div>
+                            <div class="tariff-values-grid">
+                                <div class="tariff-value-item over">
+                                    <ion-icon name="sunny-outline" class="t1-icon"></ion-icon>
+                                    <div>
+                                        <div class="tariff-value-label">Т1 (день)</div>
+                                        <div class="tariff-value-amount">${parseFloat(displayOverT1).toFixed(2)} ₽/кВт·ч</div>
+                                    </div>
+                                </div>
+                                <div class="tariff-value-item over">
+                                    <ion-icon name="moon-outline" class="t2-icon"></ion-icon>
+                                    <div>
+                                        <div class="tariff-value-label">Т2 (ночь)</div>
+                                        <div class="tariff-value-amount">${parseFloat(displayOverT2).toFixed(2)} ₽/кВт·ч</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
                         <div class="tariff-actions">
-                            <button class="btn btn-secondary" onclick="editTariff('electricity', '${t.id}')" style="margin-right: 8px;">
+                            <button class="btn btn-secondary" onclick="editTariff('electricity', '${t.id}')">
                                 <ion-icon name="create-outline"></ion-icon>
                                 Редактировать
                             </button>
@@ -780,16 +793,27 @@ function updateTariffList() {
                         <div class="tariff-date">
                             <ion-icon name="calendar-outline"></ion-icon>
                             ${formatDate(t.date)}
-                            ${isCurrent ? '<span style="color: var(--ios-success); font-weight: bold; margin-left: 8px;">(действует)</span>' : ''}
+                            ${isCurrent ? '<span class="current-badge">(действует)</span>' : ''}
                         </div>
-                        <div class="tariff-values">
-                            <div>
+                        
+                        <div class="tariff-section normal">
+                            <div class="tariff-section-title">
                                 <ion-icon name="flame-outline" style="color: var(--ios-warning);"></ion-icon>
-                                Газ: ${parseFloat(t.value).toFixed(2)} ₽/м³
+                                Тариф на газ
+                            </div>
+                            <div class="tariff-values-grid">
+                                <div class="tariff-value-item">
+                                    <ion-icon name="flame-outline" class="gas-icon"></ion-icon>
+                                    <div>
+                                        <div class="tariff-value-label">Газ</div>
+                                        <div class="tariff-value-amount">${parseFloat(t.value).toFixed(2)} ₽/м³</div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
+                        
                         <div class="tariff-actions">
-                            <button class="btn btn-secondary" onclick="editTariff('gas', '${t.id}')" style="margin-right: 8px;">
+                            <button class="btn btn-secondary" onclick="editTariff('gas', '${t.id}')">
                                 <ion-icon name="create-outline"></ion-icon>
                                 Редактировать
                             </button>
@@ -1821,59 +1845,229 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// ===== АНАЛИТИКА =====
+// ===== РАСШИРЕННАЯ АНАЛИТИКА =====
 function updateAnalytics() {
     const month = document.getElementById('analytics-month')?.value;
     const year = document.getElementById('analytics-year')?.value;
+    
     let filtered = [...records];
+    if (month) filtered = filtered.filter(r => {
+        const recordMonth = new Date(r.date).getMonth() + 1;
+        return recordMonth.toString() === month;
+    });
+    if (year) filtered = filtered.filter(r => {
+        const recordYear = new Date(r.date).getFullYear().toString();
+        return recordYear === year;
+    });
     
-    if (month) filtered = filtered.filter(r => (new Date(r.date).getMonth() + 1).toString() === month);
-    if (year) filtered = filtered.filter(r => new Date(r.date).getFullYear().toString() === year);
+    // Основные показатели
+    const electricityTotal = filtered.filter(r => r.type === 'electricity')
+        .reduce((sum, r) => sum + (parseFloat(r.total) || 0), 0);
+    const gasTotal = filtered.filter(r => r.type === 'gas')
+        .reduce((sum, r) => sum + (parseFloat(r.total) || 0), 0);
+    const total = electricityTotal + gasTotal;
     
-    // Считаем в копейках для точности (как в updatePaymentSummary)
-    const electricityKopecks = filtered.filter(r => r.type === 'electricity')
-        .reduce((sum, r) => sum + Math.round((parseFloat(r.total) || 0) * 100), 0);
-    const gasKopecks = filtered.filter(r => r.type === 'gas')
-        .reduce((sum, r) => sum + Math.round((parseFloat(r.total) || 0) * 100), 0);
+    // Обновляем основные карточки
+    document.getElementById('analytics-total').textContent = `${total.toFixed(2)} ₽`;
+    document.getElementById('analytics-electricity').textContent = `${electricityTotal.toFixed(2)} ₽`;
+    document.getElementById('analytics-gas').textContent = `${gasTotal.toFixed(2)} ₽`;
     
-    // Переводим обратно в рубли
-    const electricity = electricityKopecks / 100;
-    const gas = gasKopecks / 100;
+    // Детальная статистика
+    const electricityRecords = filtered.filter(r => r.type === 'electricity');
+    const gasRecords = filtered.filter(r => r.type === 'gas');
     
-    const stats = {
-        electricity: electricity,
-        gas: gas,
-        salt: filtered.filter(r => r.type === 'salt').length,
-        cartridge: filtered.filter(r => r.type === 'cartridge').length,
-        total: (electricityKopecks + gasKopecks) / 100
-    };
+    const avgElectricityConsumption = electricityRecords.length > 0 
+        ? electricityRecords.reduce((sum, r) => sum + (r.consumptionT1 + r.consumptionT2), 0) / electricityRecords.length 
+        : 0;
+    
+    const avgGasConsumption = gasRecords.length > 0 
+        ? gasRecords.reduce((sum, r) => sum + r.consumption, 0) / gasRecords.length 
+        : 0;
+    
+    const avgElectricityCost = electricityRecords.length > 0 
+        ? electricityTotal / electricityRecords.reduce((sum, r) => sum + (r.consumptionT1 + r.consumptionT2), 0) 
+        : 0;
+    
+    const avgGasCost = gasRecords.length > 0 
+        ? gasTotal / gasRecords.reduce((sum, r) => sum + r.consumption, 0) 
+        : 0;
+    
+    const maxElectricity = electricityRecords.length > 0 
+        ? Math.max(...electricityRecords.map(r => r.consumptionT1 + r.consumptionT2)) 
+        : 0;
+    
+    const minElectricity = electricityRecords.length > 0 
+        ? Math.min(...electricityRecords.map(r => r.consumptionT1 + r.consumptionT2)) 
+        : 0;
+    
+    const saltCount = filtered.filter(r => r.type === 'salt').length;
+    const cartridgeCount = filtered.filter(r => r.type === 'cartridge').length;
+    
+    // Обновляем статистику
+    document.getElementById('stat-avg-electricity').textContent = `${avgElectricityConsumption.toFixed(2)} кВт·ч`;
+    document.getElementById('stat-avg-gas').textContent = `${avgGasConsumption.toFixed(2)} м³`;
+    document.getElementById('stat-avg-electricity-cost').textContent = `${avgElectricityCost.toFixed(2)} ₽/кВт·ч`;
+    document.getElementById('stat-avg-gas-cost').textContent = `${avgGasCost.toFixed(2)} ₽/м³`;
+    document.getElementById('stat-max-electricity').textContent = `${maxElectricity.toFixed(2)} кВт·ч`;
+    document.getElementById('stat-min-electricity').textContent = `${minElectricity.toFixed(2)} кВт·ч`;
+    document.getElementById('stat-salt-count').textContent = `${saltCount} раз`;
+    document.getElementById('stat-cartridge-count').textContent = `${cartridgeCount} раз`;
+    
+    // Анализ по месяцам
+    updateMonthlyBreakdown(filtered);
+    
+    // Сравнение периодов
+    updateComparison();
+    
+    // Динамика платежей
+    updatePaymentStats();
+    
+    // Обновляем статистику платежей (по умолчанию все)
+    currentPaymentType = 'all';
+    updatePaymentStats();
+}
 
-    const statsGrid = document.getElementById('analytics-stats');
-    if (statsGrid) {
-        statsGrid.innerHTML = `
-            <div class="stat-card">
-                <h3>Электроэнергия</h3>
-                <div class="stat-value">${stats.electricity.toFixed(2)} ₽</div>
-            </div>
-            <div class="stat-card">
-                <h3>Газ</h3>
-                <div class="stat-value">${stats.gas.toFixed(2)} ₽</div>
-            </div>
-            <div class="stat-card">
-                <h3>Засыпки соли</h3>
-                <div class="stat-value">${stats.salt} раз</div>
-            </div>
-            <div class="stat-card">
-                <h3>Замены картриджа</h3>
-                <div class="stat-value">${stats.cartridge} раз</div>
-            </div>
-            <div class="stat-card total">
-                <h3>Итого расходов</h3>
-                <div class="stat-value">${stats.total.toFixed(2)} ₽</div>
+
+
+function updateMonthlyBreakdown(filtered) {
+    const monthlyData = {};
+    
+    filtered.forEach(r => {
+        const monthKey = r.date.substring(0, 7); // YYYY-MM
+        if (!monthlyData[monthKey]) {
+            monthlyData[monthKey] = { electricity: 0, gas: 0, total: 0 };
+        }
+        if (r.type === 'electricity') {
+            monthlyData[monthKey].electricity += parseFloat(r.total) || 0;
+            monthlyData[monthKey].total += parseFloat(r.total) || 0;
+        } else if (r.type === 'gas') {
+            monthlyData[monthKey].gas += parseFloat(r.total) || 0;
+            monthlyData[monthKey].total += parseFloat(r.total) || 0;
+        }
+    });
+    
+    const sortedMonths = Object.keys(monthlyData).sort().reverse();
+    const container = document.getElementById('monthly-breakdown');
+    
+    if (sortedMonths.length === 0) {
+        container.innerHTML = '<p class="hint-text">Нет данных</p>';
+        return;
+    }
+    
+    container.innerHTML = sortedMonths.map(month => {
+        const data = monthlyData[month];
+        const monthName = new Date(month + '-01').toLocaleDateString('ru-RU', { year: 'numeric', month: 'long' });
+        return `
+            <div class="monthly-item">
+                <div class="monthly-month">${monthName}</div>
+                <div class="monthly-electricity">
+                    <div class="monthly-label">Электроэнергия</div>
+                    <div class="monthly-value">${data.electricity.toFixed(2)} ₽</div>
+                </div>
+                <div class="monthly-gas">
+                    <div class="monthly-label">Газ</div>
+                    <div class="monthly-value">${data.gas.toFixed(2)} ₽</div>
+                </div>
             </div>
         `;
-    }
+    }).join('');
 }
+
+
+
+function updatePaymentStats() {
+    // Фильтруем платежи по типу
+    let filteredPayments = payments;
+    if (currentPaymentType !== 'all') {
+        filteredPayments = payments.filter(p => p.type === currentPaymentType);
+    }
+    
+    const totalPaid = filteredPayments.reduce((sum, p) => sum + p.amount, 0);
+    const avgPayment = filteredPayments.length > 0 ? totalPaid / filteredPayments.length : 0;
+    
+    // Фильтруем начисления по типу
+    let filteredRecords = records;
+    if (currentPaymentType !== 'all') {
+        filteredRecords = records.filter(r => r.type === currentPaymentType);
+    }
+    
+    const totalCharged = filteredRecords.reduce((sum, r) => sum + (parseFloat(r.total) || 0), 0);
+    const balance = totalPaid - totalCharged;
+
+    document.getElementById('payment-total').textContent = `${totalPaid.toFixed(2)} ₽`;
+    document.getElementById('payment-avg').textContent = `${avgPayment.toFixed(2)} ₽`;
+    document.getElementById('payment-count').textContent = filteredPayments.length.toString();
+
+    const balanceEl = document.getElementById('payment-balance');
+    balanceEl.textContent = `${balance.toFixed(2)} ₽`;
+    balanceEl.style.color = balance >= 0 ? 'var(--ios-success)' : 'var(--ios-danger)';
+}
+
+// ===== ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК СРАВНЕНИЯ =====
+function showComparison(type) {
+    // Обновляем активную вкладку
+    document.querySelectorAll('.comparison-tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+    // Находим нажатую кнопку
+    const clickedTab = Array.from(document.querySelectorAll('.comparison-tab'))
+        .find(tab => tab.textContent.includes(type === 'electricity' ? 'Электроэнергия' : 'Газ'));
+    
+    if (clickedTab) {
+        clickedTab.classList.add('active');
+    }
+    
+    // Обновляем тип для статистики платежей
+    currentPaymentType = type;
+    
+    // Обновляем контент сравнения
+    updateComparison(type);
+    
+    // Обновляем статистику платежей
+    updatePaymentStats();
+}
+
+function updateComparison(type = 'electricity') {
+    const recordsByType = records.filter(r => r.type === type);
+    const byYear = {};
+    
+    recordsByType.forEach(r => {
+        const year = new Date(r.date).getFullYear();
+        if (!byYear[year]) byYear[year] = 0;
+        byYear[year] += parseFloat(r.total) || 0;
+    });
+
+    const years = Object.keys(byYear).sort();
+    const container = document.getElementById('comparison-content');
+
+    if (years.length < 2) {
+        container.innerHTML = '<p class="hint-text">Недостаточно данных для сравнения</p>';
+        return;
+    }
+
+    const currentYear = years[years.length - 1];
+    const previousYear = years[years.length - 2];
+    const currentAmount = byYear[currentYear];
+    const previousAmount = byYear[previousYear];
+    const diff = currentAmount - previousAmount;
+    const diffPercent = previousAmount > 0 ? ((diff / previousAmount) * 100).toFixed(1) : 0;
+
+    container.innerHTML = `
+        <div class="comparison-period">
+            <div class="comparison-label">${previousYear} год</div>
+            <div class="comparison-value">${previousAmount.toFixed(2)} ₽</div>
+        </div>
+        <div class="comparison-period">
+            <div class="comparison-label">${currentYear} год</div>
+            <div class="comparison-value">${currentAmount.toFixed(2)} ₽</div>
+            <div class="comparison-diff ${diff >= 0 ? 'negative' : 'positive'}">
+                ${diff >= 0 ? '↑' : '↓'} ${Math.abs(diff).toFixed(2)} ₽ (${diffPercent}%)
+            </div>
+        </div>
+    `;
+}
+
 
 // ===== УТИЛИТЫ =====
 function formatDate(dateStr) {
@@ -2253,11 +2447,12 @@ window.exportData = exportData;
 window.importData = importData;
 window.resetAllData = resetAllData;
 window.recalculateAll = recalculateAll;
-// Экспорт функций редактирования тарифов
+window.autoFillOverTariffs = autoFillOverTariffs;
 window.editTariff = editTariff;
 window.closeEditTariffModal = closeEditTariffModal;
 window.saveEditedTariff = saveEditedTariff;
-// Экспорт функций редактирования платежей
 window.editPayment = editPayment;
 window.closeEditPaymentModal = closeEditPaymentModal;
 window.saveEditedPayment = saveEditedPayment;
+window.showComparison = showComparison;
+window.updateComparison = updateComparison;

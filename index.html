@@ -18,7 +18,7 @@
     <script nomodule src="https://unpkg.com/ionicons@7.4.0/dist/ionicons/ionicons.js"></script>
     
     <script type="module" src="firebase-config.js?v=5.0.0"></script>
-    <script type="module" src="script.js?v=1.1.1"></script>
+    <script type="module" src="script.js?v=1.1.2"></script>
 </head>
 <body>
     <header class="top-header">
@@ -370,31 +370,134 @@
         </div>
 
         <!-- Вкладка: Аналитика -->
-        <div id="tab-analytics" class="tab-content">
-            <div class="card">
-                <h2>
-                    <ion-icon name="stats-chart-outline" class="section-icon"></ion-icon>
-                    Аналитика расходов
-                </h2>
-                
-                <div class="period-selector">
-                    <div class="form-group">
-                        <label>Месяц</label>
-                        <select id="analytics-month" onchange="updateAnalytics()">
-                            <option value="">Все месяцы</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Год</label>
-                        <select id="analytics-year" onchange="updateAnalytics()">
-                            <option value="">Все годы</option>
-                        </select>
-                    </div>
+<div id="tab-analytics" class="tab-content">
+    <div class="card">
+        <h2>
+            <ion-icon name="stats-chart-outline" class="section-icon"></ion-icon>
+            Расширенная аналитика
+        </h2>
+        
+        <!-- Фильтры -->
+        <div class="analytics-filters">
+            <div class="form-row two-columns">
+                <div class="form-group">
+                    <label>Месяц</label>
+                    <select id="analytics-month" onchange="updateAnalytics()">
+                        <option value="">Все месяцы</option>
+                    </select>
                 </div>
-
-                <div class="stats-grid" id="analytics-stats"></div>
+                <div class="form-group">
+                    <label>Год</label>
+                    <select id="analytics-year" onchange="updateAnalytics()">
+                        <option value="">Все годы</option>
+                    </select>
+                </div>
             </div>
         </div>
+        
+        <!-- Основные показатели -->
+        <div class="analytics-summary">
+            <div class="summary-card total">
+                <div class="summary-icon">💰</div>
+                <div class="summary-label">Общие расходы</div>
+                <div class="summary-value" id="analytics-total">0 ₽</div>
+            </div>
+            <div class="summary-card electricity">
+                <div class="summary-icon">⚡</div>
+                <div class="summary-label">Электроэнергия</div>
+                <div class="summary-value" id="analytics-electricity">0 ₽</div>
+            </div>
+            <div class="summary-card gas">
+                <div class="summary-icon">🔥</div>
+                <div class="summary-label">Газ</div>
+                <div class="summary-value" id="analytics-gas">0 ₽</div>
+            </div>
+        </div>
+        
+        <!-- Детальная статистика -->
+        <div class="analytics-details">
+            <h3>📈 Детальная статистика</h3>
+            
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-label">Средний расход электроэнергии в месяц</div>
+                    <div class="stat-value" id="stat-avg-electricity">0 кВт·ч</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Средний расход газа в месяц</div>
+                    <div class="stat-value" id="stat-avg-gas">0 м³</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Средняя стоимость электроэнергии</div>
+                    <div class="stat-value" id="stat-avg-electricity-cost">0 ₽/кВт·ч</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Средняя стоимость газа</div>
+                    <div class="stat-value" id="stat-avg-gas-cost">0 ₽/м³</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Максимальный расход электроэнергии</div>
+                    <div class="stat-value" id="stat-max-electricity">0 кВт·ч</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Минимальный расход электроэнергии</div>
+                    <div class="stat-value" id="stat-min-electricity">0 кВт·ч</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Всего засыпок соли</div>
+                    <div class="stat-value" id="stat-salt-count">0 раз</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Всего замен картриджа</div>
+                    <div class="stat-value" id="stat-cartridge-count">0 раз</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Анализ по месяцам -->
+        <div class="analytics-monthly">
+            <h3>📅 Анализ по месяцам</h3>
+            <div id="monthly-breakdown" class="monthly-breakdown">
+                <!-- Динамически заполняется -->
+            </div>
+        </div>
+        
+        <!-- Сравнение периодов -->
+        <div class="analytics-comparison">
+            <h3>📊 Сравнение периодов</h3>
+            <div class="comparison-tabs">
+                <button class="comparison-tab active" onclick="showComparison('electricity')">Электроэнергия</button>
+                <button class="comparison-tab" onclick="showComparison('gas')">Газ</button>
+            </div>
+            <div id="comparison-content" class="comparison-content">
+                <!-- Динамически заполняется -->
+            </div>
+        </div>
+        
+        <!-- Динамика платежей -->
+        <div class="analytics-payments">
+            <h3>💳 Динамика платежей</h3>
+            <div class="payment-stats">
+                <div class="payment-stat">
+                    <div class="payment-label">Всего оплачено</div>
+                    <div class="payment-value" id="payment-total">0 ₽</div>
+                </div>
+                <div class="payment-stat">
+                    <div class="payment-label">Средний платеж</div>
+                    <div class="payment-value" id="payment-avg">0 ₽</div>
+                </div>
+                <div class="payment-stat">
+                    <div class="payment-label">Количество платежей</div>
+                    <div class="payment-value" id="payment-count">0</div>
+                </div>
+                <div class="payment-stat">
+                    <div class="payment-label">Текущий баланс</div>
+                    <div class="payment-value" id="payment-balance">0 ₽</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
         <!-- Вкладка: История -->
         <div id="tab-history" class="tab-content">
@@ -523,12 +626,7 @@
     </form>
 </div>
                         
-                        <button type="submit" class="btn btn-success">
-                            <ion-icon name="add-circle-outline" class="btn-icon"></ion-icon>
-                            Добавить тариф на электричество
-                        </button>
-                    </form>
-                </div>
+                        
                 
                 <!-- Форма: Тарифы на газ -->
                 <div id="tariff-gas" class="tariff-form-section">
@@ -571,23 +669,25 @@
                 </div>
 
                 <div class="tariffs-history">
-                    <h3>
-                        <ion-icon name="time-outline" class="section-icon"></ion-icon>
-                        История тарифов
-                    </h3>
-                    
-                    <h4 class="tariff-subheader">
-                        <ion-icon name="flash-outline"></ion-icon>
-                        Электроэнергия
-                    </h4>
-                    <div id="tariffs-list-electricity" class="tariffs-list"></div>
-                    
-                    <h4 class="tariff-subheader">
-                        <ion-icon name="flame-outline"></ion-icon>
-                        Газ
-                    </h4>
-                    <div id="tariffs-list-gas" class="tariffs-list"></div>
-                </div>
+    <h3>
+        <ion-icon name="time-outline" class="section-icon"></ion-icon>
+        История тарифов
+    </h3>
+    
+    <!-- Электроэнергия -->
+    <div class="tariff-section-header electricity">
+        <ion-icon name="flash-outline"></ion-icon>
+        <span>Электроэнергия</span>
+    </div>
+    <div id="tariffs-list-electricity" class="tariffs-list"></div>
+    
+    <!-- Газ -->
+    <div class="tariff-section-header gas">
+        <ion-icon name="flame-outline"></ion-icon>
+        <span>Газ</span>
+    </div>
+    <div id="tariffs-list-gas" class="tariffs-list"></div>
+</div>
             </div>
         </div>
 
