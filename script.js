@@ -2278,7 +2278,7 @@ async function recalculateAll() {
 function initDraggableNav() {
     const nav = document.querySelector('.floating-nav');
     if (!nav) return;
-
+    
     let isDragging = false;
     let startX = 0;
     let startY = 0;
@@ -2288,6 +2288,7 @@ function initDraggableNav() {
     let currentY = 0;
     let dragStartTime = 0;
     let hasMoved = false;
+    let clickedButton = null;
 
     // Загружаем сохраненную позицию
     const savedPos = localStorage.getItem('nav_position');
@@ -2312,17 +2313,17 @@ function initDraggableNav() {
     document.addEventListener('touchend', dragEnd);
 
     function dragStart(e) {
-        // Если кликнули по кнопке - не начинаем перетаскивание
-        if (e.target.closest('.nav-btn')) {
-            // Проверяем, было ли это короткое нажатие (клик)
-            dragStartTime = Date.now();
-            hasMoved = false;
-            return;
-        }
-
         isDragging = true;
         dragStartTime = Date.now();
         hasMoved = false;
+        clickedButton = null;
+        
+        // Проверяем, кликнули ли по кнопке
+        const btn = e.target.closest('.nav-btn');
+        if (btn) {
+            clickedButton = btn;
+        }
+        
         if (e.type === 'touchstart') {
             startX = e.touches[0].clientX;
             startY = e.touches[0].clientY;
@@ -2357,7 +2358,7 @@ function initDraggableNav() {
         const deltaX = clientX - startX;
         const deltaY = clientY - startY;
 
-        // Если движение больше 5px - считаем это перетаскиванием
+        // Если движение больше 5 px - считаем это перетаскиванием
         if (Math.abs(deltaX) > 5 || Math.abs(deltaY) > 5) {
             hasMoved = true;
         }
@@ -2373,6 +2374,7 @@ function initDraggableNav() {
 
         currentX = Math.max(10, Math.min(currentX, screenWidth - navWidth - 10));
         currentY = Math.max(10, Math.min(currentY, screenHeight - navHeight - 10));
+        
         nav.style.left = currentX + 'px';
         nav.style.top = currentY + 'px';
         nav.style.bottom = 'auto';
@@ -2391,14 +2393,15 @@ function initDraggableNav() {
             y: currentY
         }));
 
-        // Если это был клик (не перетаскивание) - обрабатываем кнопку
-        if (!hasMoved && e.target.closest('.nav-btn')) {
-            const btn = e.target.closest('.nav-btn');
-            const tabName = btn.getAttribute('onclick')?.match(/'([^']+)'/)?.[1];
+        // Если это был клик (не перетаскивание) и была нажата кнопка - обрабатываем клик
+        if (!hasMoved && clickedButton) {
+            const tabName = clickedButton.getAttribute('onclick')?.match(/'([^']+)'/)?.[1];
             if (tabName) {
-                switchTab(tabName, btn);
+                switchTab(tabName, clickedButton);
             }
         }
+        
+        clickedButton = null;
     }
 
     // Двойной клик - вернуть меню в центр внизу
