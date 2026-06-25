@@ -379,10 +379,40 @@ function switchTab(tabName, btn) {
 // ===== ПЕРЕКЛЮЧЕНИЕ ТИПА ВВОДА =====
 function showInputType(type, btn) {
     currentInputType = type;
+    
+    // Скрываем все формы ввода
     document.querySelectorAll('.input-form').forEach(form => form.classList.remove('active'));
     document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+    
+    // Показываем выбранную форму
     document.getElementById(`input-${type}`).classList.add('active');
     if (btn) btn.classList.add('active');
+    
+    // Скрываем все секции оплаты
+    document.querySelectorAll('.payment-section').forEach(section => {
+        section.style.display = 'none';
+    });
+    
+    // Показываем только секцию оплаты для выбранного типа
+    const paymentSection = document.getElementById(`payment-${type}`);
+    if (paymentSection) {
+        paymentSection.style.display = 'block';
+    }
+    
+    // Скрываем/показываем кнопки действий в зависимости от типа
+    const formActions = document.querySelector('.form-actions');
+    if (formActions) {
+        if (type === 'salt' || type === 'cartridge') {
+            // Для соли и картриджа скрываем кнопку "Оплатить"
+            const payBtn = formActions.querySelector('.btn-primary');
+            if (payBtn) payBtn.style.display = 'none';
+        } else {
+            // Для электричества и газа показываем все кнопки
+            const payBtn = formActions.querySelector('.btn-primary');
+            if (payBtn) payBtn.style.display = 'block';
+        }
+    }
+    
     initDates();
     if (type === 'electricity') autoCalcElectric();
     if (type === 'gas') autoCalcGas();
