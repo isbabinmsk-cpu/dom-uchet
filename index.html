@@ -3,934 +3,464 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="description" content="Учет коммунальных платежей - электричество, газ, соль, картридж">
-    <meta name="theme-color" content="#007AFF">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="Дом Учет">
-    <title>Учет коммунальных платежей</title>
-    
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path fill='%23007AFF' d='M256 32C114.6 32 0 125.1 0 240c0 49.6 21.4 95 57 130.7C44.5 421.1 2.7 466 2.2 466.5a8 8 0 0 0 5.8 13.5h192.2a8 8 0 0 0 7.8-6c17.4-69.4 79.5-120 153.5-120h1.5c79.5 0 144-53.7 144-120C512 125.1 397.4 32 256 32z'/></svg>">
-    
-    <link rel="stylesheet" href="style.css?v=5.0.0">
-    
-    <script type="module" src="https://unpkg.com/ionicons@7.4.0/dist/ionicons/ionicons.esm.js"></script>
-    <script nomodule src="https://unpkg.com/ionicons@7.4.0/dist/ionicons/ionicons.js"></script>
-    
-    <script type="module" src="firebase-config.js?v=5.0.0"></script>
-    <script type="module" src="script.js?v=1.1.3"></script>
+    <title>Учет Коммунальных Платежей</title>
+    <link rel="stylesheet" href="style.css">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 </head>
 <body>
+
+    <!-- HEADER -->
     <header class="top-header">
-        <h1>
-            <ion-icon name="home-outline" class="header-icon"></ion-icon>
-            Учет коммунальных платежей
-        </h1>
+        <div class="header-grid">
+            <div class="header-left">
+                
+                <h1 class="header-title">Коммунальный<br><span class="serif-italic">Учет</span></h1>
+            </div>
+            <div class="header-right">
+                <div id="sync-status" class="sync-status">
+                    <span class="status-dot"></span>
+                    <span>Локальное хранение</span>
+                </div>
+            </div>
+        </div>
     </header>
 
     <main class="container">
-        <!-- Вкладка: Ввод -->
-        <div id="tab-input" class="tab-content active">
-            <div class="card">
-                <h2>
-                    <ion-icon name="add-circle-outline" class="section-icon"></ion-icon>
-                    Ввод показаний
-                </h2>
-                
-                <!-- Переключатель типа записи -->
+        <!-- TAB: INPUT -->
+        <section id="tab-input" class="tab-content active">
+            <div class="section-header">
+                <span class="section-tag">ВВОД ПОКАЗАНИЙ</span>
                 <div class="type-selector">
                     <button class="type-btn active" onclick="showInputType('electricity', this)">
                         <ion-icon name="flash-outline"></ion-icon>
-                        <span>Электроэнергия</span>
+                        <span>Электричество</span>
                     </button>
                     <button class="type-btn" onclick="showInputType('gas', this)">
                         <ion-icon name="flame-outline"></ion-icon>
                         <span>Газ</span>
                     </button>
-                    <button class="type-btn" onclick="showInputType('salt', this)">                        <ion-icon name="snow-outline"></ion-icon>
+                    <button class="type-btn" onclick="showInputType('salt', this)">
+                        <ion-icon name="snow-outline"></ion-icon>
                         <span>Соль</span>
                     </button>
                     <button class="type-btn" onclick="showInputType('cartridge', this)">
-                        <ion-icon name="filter-outline"></ion-icon>
+                        <ion-icon name="water-outline"></ion-icon>
                         <span>Картридж</span>
                     </button>
                 </div>
-                
-                <!-- Форма: Электроэнергия -->
-<div id="input-electricity" class="input-form active">
-    <div class="form-section">
-        <h3>
-            <ion-icon name="flash-outline" class="form-icon electricity-icon"></ion-icon>
-            Электроэнергия
-        </h3>
-        
-        <div class="form-row">
-            <div class="form-group">
-                <label>
-                    <ion-icon name="calendar-outline" class="form-icon"></ion-icon>
-                    Дата *
-                </label>
-                <input type="date" id="elec-date" required>
             </div>
-        </div>
-        
-        <div class="form-row two-columns">
-            <div class="form-group">
-                <label>
-                    <ion-icon name="sunny-outline" class="form-icon t1-icon"></ion-icon>
-                    Т1 (день) *
-                </label>
-                <input type="number" id="elec-t1" step="0.01" min="0" required oninput="autoCalcElectric()">
-            </div>
-            <div class="form-group">
-                <label>
-                    <ion-icon name="moon-outline" class="form-icon t2-icon"></ion-icon>
-                    Т2 (ночь) *
-                </label>
-                <input type="number" id="elec-t2" step="0.01" min="0" required oninput="autoCalcElectric()">
-            </div>
-        </div>
-        
-        <div class="calc-results">
-            <div class="calc-item">
-                <span>Расход Т1:</span>
-                <strong id="elec-t1-consumption">0 кВт·ч</strong>
-            </div>
-            <div class="calc-item">
-                <span>Расход Т2:</span>
-                <strong id="elec-t2-consumption">0 кВт·ч</strong>
-            </div>
-            <div class="calc-item total">
-                <span>Стоимость:</span>
-                <strong id="elec-total">0 ₽</strong>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Секция оплаты электричества -->
-    <div id="payment-electricity" class="form-section payment-section">
-        <h3>
-            <ion-icon name="cash-outline" class="form-icon payment-icon"></ion-icon>
-            Оплата электроэнергии
-        </h3>
-        
-        <div class="form-row two-columns">
-            <div class="form-group">
-                <label>
-                    <ion-icon name="calendar-outline" class="form-icon"></ion-icon>
-                    Дата оплаты *
-                </label>
-                <input type="date" id="pay-elec-date">
-            </div>
-            <div class="form-group">
-                <label>
-                    <ion-icon name="cash-outline" class="form-icon"></ion-icon>
-                    Сумма (₽) *
-                </label>
-                <input type="number" id="pay-elec-amount" step="0.01" min="0">
-            </div>
-        </div>
-    </div>
-    
-    <div class="form-actions">
-        <button type="button" class="btn btn-success" onclick="saveRecord('electricity')">
-            <ion-icon name="save-outline"></ion-icon>
-            Сохранить
-        </button>
-        <button type="button" class="btn btn-primary" onclick="savePayment('electricity')">
-            <ion-icon name="cash-outline"></ion-icon>
-            Оплатить
-        </button>
-        <button type="button" class="btn btn-secondary" onclick="clearForm('electricity')">
-            <ion-icon name="trash-outline"></ion-icon>
-            Очистить
-        </button>
-    </div>
-</div>
 
-<!-- Форма: Газ -->
-<div id="input-gas" class="input-form">
-    <div class="form-section">
-        <h3>
-            <ion-icon name="flame-outline" class="form-icon gas-icon"></ion-icon>
-            Газ
-        </h3>
-        
-        <div class="form-row">
-            <div class="form-group">
-                <label>
-                    <ion-icon name="calendar-outline" class="form-icon"></ion-icon>
-                    Дата *
-                </label>
-                <input type="date" id="gas-date" required>
-            </div>
-        </div>
-        
-        <div class="form-row">
-            <div class="form-group">
-                <label>
-                    <ion-icon name="speedometer-outline" class="form-icon"></ion-icon>
-                    Показание (м³) *
-                </label>
-                <input type="number" id="gas-reading" step="0.01" min="0" required oninput="autoCalcGas()">
-            </div>
-        </div>
-        
-        <div class="calc-results">
-            <div class="calc-item">
-                <span>Расход:</span>
-                <strong id="gas-consumption">0 м³</strong>
-            </div>
-            <div class="calc-item total">
-                <span>Стоимость:</span>
-                <strong id="gas-total">0 ₽</strong>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Секция оплаты газа -->
-    <div id="payment-gas" class="form-section payment-section" style="display: none;">
-        <h3>
-            <ion-icon name="cash-outline" class="form-icon payment-icon"></ion-icon>
-            Оплата газа
-        </h3>
-        
-        <div class="form-row two-columns">
-            <div class="form-group">
-                <label>
-                    <ion-icon name="calendar-outline" class="form-icon"></ion-icon>
-                    Дата оплаты *
-                </label>
-                <input type="date" id="pay-gas-date">
-            </div>
-            <div class="form-group">
-                <label>
-                    <ion-icon name="cash-outline" class="form-icon"></ion-icon>
-                    Сумма (₽) *
-                </label>
-                <input type="number" id="pay-gas-amount" step="0.01" min="0">
-            </div>
-        </div>
-    </div>
-    
-    <div class="form-actions">
-        <button type="button" class="btn btn-success" onclick="saveRecord('gas')">
-            <ion-icon name="save-outline"></ion-icon>
-            Сохранить
-        </button>
-        <button type="button" class="btn btn-primary" onclick="savePayment('gas')">
-            <ion-icon name="cash-outline"></ion-icon>
-            Оплатить
-        </button>
-        <button type="button" class="btn btn-secondary" onclick="clearForm('gas')">
-            <ion-icon name="trash-outline"></ion-icon>
-            Очистить
-        </button>
-    </div>
-</div>
-
-<!-- Форма: Соль -->
-<div id="input-salt" class="input-form">
-    <div class="form-section">
-        <h3>
-            <ion-icon name="snow-outline" class="form-icon salt-icon"></ion-icon>
-            Засыпка соли
-        </h3>
-        
-        <div class="form-row">
-            <div class="form-group">
-                <label>
-                    <ion-icon name="calendar-outline" class="form-icon"></ion-icon>
-                    Дата *
-                </label>
-                <input type="date" id="salt-date" required>
-            </div>
-        </div>
-        
-        <div class="form-row">
-            <div class="form-group">
-                <label>
-                    <ion-icon name="scale-outline" class="form-icon"></ion-icon>
-                    Количество (кг) *
-                </label>
-                <input type="number" id="salt-kg" step="0.1" min="0" value="25" required>
-            </div>
-        </div>
-    </div>
-    
-    <div class="form-actions">
-        <button type="button" class="btn btn-success" onclick="saveRecord('salt')">
-            <ion-icon name="save-outline"></ion-icon>
-            Сохранить
-        </button>
-        <button type="button" class="btn btn-secondary" onclick="clearForm('salt')">
-            <ion-icon name="trash-outline"></ion-icon>
-            Очистить
-        </button>
-    </div>
-</div>
-
-<!-- Форма: Картридж -->
-<div id="input-cartridge" class="input-form">
-    <div class="form-section">
-        <h3>
-            <ion-icon name="filter-outline" class="form-icon cartridge-icon"></ion-icon>
-            Замена картриджа
-        </h3>
-        
-        <div class="form-row">
-            <div class="form-group">
-                <label>
-                    <ion-icon name="calendar-outline" class="form-icon"></ion-icon>
-                    Дата *
-                </label>
-                <input type="date" id="cartridge-date" required>
-            </div>
-        </div>
-    </div>
-    
-    <div class="form-actions">
-        <button type="button" class="btn btn-success" onclick="saveRecord('cartridge')">
-            <ion-icon name="save-outline"></ion-icon>
-            Сохранить
-        </button>
-        <button type="button" class="btn btn-secondary" onclick="clearForm('cartridge')">
-            <ion-icon name="trash-outline"></ion-icon>
-            Очистить
-        </button>
-    </div>
-</div>
-            </div></div>
-                
-
-        <!-- Вкладка: Оплаты -->
-        <div id="tab-payments" class="tab-content">
-            <div class="card">
-                <h2>
-                    <ion-icon name="cash-outline" class="section-icon"></ion-icon>
-                    История оплат и баланс
-                </h2>
-                
-                <div class="filter-tabs">
-                    <button class="filter-tab active" onclick="filterPayments('all')">Все</button>
-                    <button class="filter-tab" onclick="filterPayments('electricity')">
-                        <ion-icon name="flash-outline"></ion-icon> Электричество
-                    </button>
-                    <button class="filter-tab" onclick="filterPayments('gas')">
-                        <ion-icon name="flame-outline"></ion-icon> Газ
-                    </button>
-                </div>
-                
-                <!-- Баланс по категориям -->
-                <div class="balance-summary">
-                    <div class="balance-card electricity">
-                        <div class="balance-card-header">
-                            <ion-icon name="flash-outline"></ion-icon>
-                            <span>Электроэнергия</span>
+            <!-- Electricity Form -->
+            <div id="input-electricity" class="input-form active">
+                <div class="card">
+                    <div class="form-row two-columns">
+                        <div class="form-group">
+                            <label><ion-icon name="calendar-outline"></ion-icon> Дата</label>
+                            <input type="date" id="elec-date" oninput="autoCalcElectric()">
                         </div>
-                        <div class="balance-card-values">
-                            <div class="balance-row">
-                                <span>Начислено:</span>
-                                <strong id="summary-charged-elec">0 ₽</strong>
-                            </div>
-                            <div class="balance-row">
-                                <span>Оплачено:</span>
-                                <strong id="summary-paid-elec">0 ₽</strong>
-                            </div>
-                            <div class="balance-row balance-result">
-                                <span>Баланс:</span>
-                                <strong id="summary-balance-elec">0 ₽</strong>
-                            </div>
+                        <div class="form-group">
+                            <label><ion-icon name="sunny-outline"></ion-icon> Т1 (День)</label>
+                            <input type="number" id="elec-t1" step="0.01" oninput="autoCalcElectric()">
                         </div>
+                    </div>
+                    <div class="form-group">
+                        <label><ion-icon name="moon-outline"></ion-icon> Т2 (Ночь)</label>
+                        <input type="number" id="elec-t2" step="0.01" oninput="autoCalcElectric()">
                     </div>
                     
-                    <div class="balance-card gas">
-                        <div class="balance-card-header">
-                            <ion-icon name="flame-outline"></ion-icon>
-                            <span>Газ</span>
-                        </div>
-                        <div class="balance-card-values">                            <div class="balance-row">
-                                <span>Начислено:</span>
-                                <strong id="summary-charged-gas">0 ₽</strong>
+                    <div class="calc-results">
+                        <div class="calc-item"><span>Расход Т1</span><strong id="elec-t1-consumption">0 кВт·ч</strong></div>
+                        <div class="calc-item"><span>Расход Т2</span><strong id="elec-t2-consumption">0 кВт·ч</strong></div>
+                        <div class="calc-item total"><span>Итого к оплате</span><strong id="elec-total">0 ₽</strong></div>
+                    </div>
+
+                    <div class="payment-section" id="payment-electricity">
+                        <h3><ion-icon name="card-outline"></ion-icon> Оплата</h3>
+                        <div class="form-row two-columns">
+                            <div class="form-group">
+                                <label>Дата оплаты</label>
+                                <input type="date" id="pay-elec-date">
                             </div>
-                            <div class="balance-row">
-                                <span>Оплачено:</span>
-                                <strong id="summary-paid-gas">0 ₽</strong>
-                            </div>
-                            <div class="balance-row balance-result">
-                                <span>Баланс:</span>
-                                <strong id="summary-balance-gas">0 ₽</strong>
+                            <div class="form-group">
+                                <label>Сумма (₽)</label>
+                                <input type="number" id="pay-elec-amount" step="0.01">
                             </div>
                         </div>
                     </div>
+
+                    <div class="form-actions stacked">
+                        <button class="btn btn-primary" onclick="saveRecord('electricity')"><ion-icon name="save-outline"></ion-icon> Сохранить показания</button>
+                        <button class="btn btn-secondary" onclick="savePayment('electricity')"><ion-icon name="cash-outline"></ion-icon> Оплатить</button>
+                        <button class="btn btn-ghost" onclick="clearForm('electricity')"><ion-icon name="refresh-outline"></ion-icon> Очистить</button>
+                    </div>
                 </div>
-                
+            </div>
+
+            <!-- Gas Form -->
+            <div id="input-gas" class="input-form">
+                <div class="card">
+                    <div class="form-group">
+                        <label><ion-icon name="calendar-outline"></ion-icon> Дата</label>
+                        <input type="date" id="gas-date" oninput="autoCalcGas()">
+                    </div>
+                    <div class="form-group">
+                        <label><ion-icon name="speedometer-outline"></ion-icon> Показание (м³)</label>
+                        <input type="number" id="gas-reading" step="0.01" oninput="autoCalcGas()">
+                    </div>
+                    <div class="calc-results">
+                        <div class="calc-item"><span>Расход</span><strong id="gas-consumption">0 м³</strong></div>
+                        <div class="calc-item total"><span>Итого к оплате</span><strong id="gas-total">0 ₽</strong></div>
+                    </div>
+                    <div class="payment-section" id="payment-gas">
+                        <h3><ion-icon name="card-outline"></ion-icon> Оплата</h3>
+                        <div class="form-row two-columns">
+                            <div class="form-group">
+                                <label>Дата оплаты</label>
+                                <input type="date" id="pay-gas-date">
+                            </div>
+                            <div class="form-group">
+                                <label>Сумма (₽)</label>
+                                <input type="number" id="pay-gas-amount" step="0.01">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-actions stacked">
+                        <button class="btn btn-primary" onclick="saveRecord('gas')"><ion-icon name="save-outline"></ion-icon> Сохранить показания</button>
+                        <button class="btn btn-secondary" onclick="savePayment('gas')"><ion-icon name="cash-outline"></ion-icon> Оплатить</button>
+                        <button class="btn btn-ghost" onclick="clearForm('gas')"><ion-icon name="refresh-outline"></ion-icon> Очистить</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Salt Form -->
+            <div id="input-salt" class="input-form">
+                <div class="card">
+                    <div class="form-group">
+                        <label><ion-icon name="calendar-outline"></ion-icon> Дата</label>
+                        <input type="date" id="salt-date">
+                    </div>
+                    <div class="form-group">
+                        <label><ion-icon name="scale-outline"></ion-icon> Количество (кг)</label>
+                        <input type="number" id="salt-kg" step="0.1" value="25">
+                    </div>
+                    <div class="form-actions stacked">
+                        <button class="btn btn-primary" onclick="saveRecord('salt')"><ion-icon name="save-outline"></ion-icon> Сохранить</button>
+                        <button class="btn btn-ghost" onclick="clearForm('salt')"><ion-icon name="refresh-outline"></ion-icon> Очистить</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cartridge Form -->
+            <div id="input-cartridge" class="input-form">
+                <div class="card">
+                    <div class="form-group">
+                        <label><ion-icon name="calendar-outline"></ion-icon> Дата замены</label>
+                        <input type="date" id="cartridge-date">
+                    </div>
+                    <div class="form-actions stacked">
+                        <button class="btn btn-primary" onclick="saveRecord('cartridge')"><ion-icon name="save-outline"></ion-icon> Сохранить</button>
+                        <button class="btn btn-ghost" onclick="clearForm('cartridge')"><ion-icon name="refresh-outline"></ion-icon> Очистить</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB: PAYMENTS -->
+        <section id="tab-payments" class="tab-content">
+            <div class="section-header">
+                <span class="section-tag">БАЛАНС И ОПЛАТЫ</span>
+            </div>
+            <div class="card">
+                <div class="balance-summary">
+                    <div class="balance-card electricity">
+                        <div class="balance-card-header"><ion-icon name="flash-outline"></ion-icon> Электроэнергия</div>
+                        <div class="balance-card-values">
+                            <div class="balance-row"><span>Начислено</span><strong id="summary-charged-elec">0 ₽</strong></div>
+                            <div class="balance-row"><span>Оплачено</span><strong id="summary-paid-elec">0 ₽</strong></div>
+                            <div class="balance-row balance-result"><span>Баланс</span><strong id="summary-balance-elec">0 ₽</strong></div>
+                        </div>
+                    </div>
+                    <div class="balance-card gas">
+                        <div class="balance-card-header"><ion-icon name="flame-outline"></ion-icon> Газ</div>
+                        <div class="balance-card-values">
+                            <div class="balance-row"><span>Начислено</span><strong id="summary-charged-gas">0 ₽</strong></div>
+                            <div class="balance-row"><span>Оплачено</span><strong id="summary-paid-gas">0 ₽</strong></div>
+                            <div class="balance-row balance-result"><span>Баланс</span><strong id="summary-balance-gas">0 ₽</strong></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="filter-tabs">
+                    <button class="filter-tab active" onclick="filterPayments('all')"><ion-icon name="apps-outline"></ion-icon> Все</button>
+                    <button class="filter-tab" onclick="filterPayments('electricity')"><ion-icon name="flash-outline"></ion-icon> Электричество</button>
+                    <button class="filter-tab" onclick="filterPayments('gas')"><ion-icon name="flame-outline"></ion-icon> Газ</button>
+                </div>
                 <div id="payments-list" class="payments-list"></div>
             </div>
-        </div>
+        </section>
 
-        <!-- Вкладка: Аналитика -->
-<div id="tab-analytics" class="tab-content">
-    <div class="card">
-        <h2>
-            <ion-icon name="stats-chart-outline" class="section-icon"></ion-icon>
-            Расширенная аналитика
-        </h2>
-        
-        <!-- Фильтры -->
-        <div class="analytics-filters">
-            <div class="form-row two-columns">
-                <div class="form-group">
-                    <label>Месяц</label>
+        <!-- TAB: ANALYTICS -->
+        <section id="tab-analytics" class="tab-content">
+            <div class="section-header">
+                <span class="section-tag">РАСШИРЕННАЯ АНАЛИТИКА</span>
+            </div>
+            <div class="card">
+                <div class="period-selector">
                     <select id="analytics-month" onchange="updateAnalytics()">
                         <option value="">Все месяцы</option>
                     </select>
-                </div>
-                <div class="form-group">
-                    <label>Год</label>
                     <select id="analytics-year" onchange="updateAnalytics()">
                         <option value="">Все годы</option>
                     </select>
                 </div>
-            </div>
-        </div>
-        
-        <!-- Основные показатели -->
-        <div class="analytics-summary">
-            <div class="summary-card total">
-                <div class="summary-icon">💰</div>
-                <div class="summary-label">Общие расходы</div>
-                <div class="summary-value" id="analytics-total">0 ₽</div>
-            </div>
-            <div class="summary-card electricity">
-                <div class="summary-icon">⚡</div>
-                <div class="summary-label">Электроэнергия</div>
-                <div class="summary-value" id="analytics-electricity">0 ₽</div>
-            </div>
-            <div class="summary-card gas">
-                <div class="summary-icon">🔥</div>
-                <div class="summary-label">Газ</div>
-                <div class="summary-value" id="analytics-gas">0 ₽</div>
-            </div>
-        </div>
-        
-        <!-- Детальная статистика -->
-        <div class="analytics-details">
-            <h3>📈 Детальная статистика</h3>
-            
-            <div class="stats-grid">
-                <div class="stat-item">
-                    <div class="stat-label">Средний расход электроэнергии в месяц</div>
-                    <div class="stat-value" id="stat-avg-electricity">0 кВт·ч</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-label">Средний расход газа в месяц</div>
-                    <div class="stat-value" id="stat-avg-gas">0 м³</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-label">Средняя стоимость электроэнергии</div>
-                    <div class="stat-value" id="stat-avg-electricity-cost">0 ₽/кВт·ч</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-label">Средняя стоимость газа</div>
-                    <div class="stat-value" id="stat-avg-gas-cost">0 ₽/м³</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-label">Максимальный расход электроэнергии</div>
-                    <div class="stat-value" id="stat-max-electricity">0 кВт·ч</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-label">Минимальный расход электроэнергии</div>
-                    <div class="stat-value" id="stat-min-electricity">0 кВт·ч</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-label">Всего засыпок соли</div>
-                    <div class="stat-value" id="stat-salt-count">0 раз</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-label">Всего замен картриджа</div>
-                    <div class="stat-value" id="stat-cartridge-count">0 раз</div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Анализ по месяцам -->
-        <div class="analytics-monthly">
-            <h3>📅 Анализ по месяцам</h3>
-            <div id="monthly-breakdown" class="monthly-breakdown">
-                <!-- Динамически заполняется -->
-            </div>
-        </div>
-        
-        <!-- Сравнение периодов -->
-        <div class="analytics-comparison">
-            <h3>📊 Сравнение периодов</h3>
-            <div class="comparison-tabs">
-                <button class="comparison-tab active" onclick="showComparison('electricity')">Электроэнергия</button>
-                <button class="comparison-tab" onclick="showComparison('gas')">Газ</button>
-            </div>
-            <div id="comparison-content" class="comparison-content">
-                <!-- Динамически заполняется -->
-            </div>
-        </div>
-        
-        <!-- Динамика платежей -->
-        <div class="analytics-payments">
-            <h3>💳 Динамика платежей</h3>
-            <div class="payment-stats">
-                <div class="payment-stat">
-                    <div class="payment-label">Всего оплачено</div>
-                    <div class="payment-value" id="payment-total">0 ₽</div>
-                </div>
-                <div class="payment-stat">
-                    <div class="payment-label">Средний платеж</div>
-                    <div class="payment-value" id="payment-avg">0 ₽</div>
-                </div>
-                <div class="payment-stat">
-                    <div class="payment-label">Количество платежей</div>
-                    <div class="payment-value" id="payment-count">0</div>
-                </div>
-                <div class="payment-stat">
-                    <div class="payment-label">Текущий баланс</div>
-                    <div class="payment-value" id="payment-balance">0 ₽</div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-        <!-- Вкладка: История -->
-        <div id="tab-history" class="tab-content">
-            <div class="card">                <h2>
-                    <ion-icon name="time-outline" class="section-icon"></ion-icon>
-                    История показаний
-                </h2>
                 
-                <div class="filter-tabs">
-                    <button class="filter-tab active" onclick="filterHistory('all')">Все</button>
-                    <button class="filter-tab" onclick="filterHistory('electricity')">
-                        <ion-icon name="flash-outline"></ion-icon> Электричество
-                    </button>
-                    <button class="filter-tab" onclick="filterHistory('gas')">
-                        <ion-icon name="flame-outline"></ion-icon> Газ
-                    </button>
-                    <button class="filter-tab" onclick="filterHistory('salt')">
-                        <ion-icon name="snow-outline"></ion-icon> Соль
-                    </button>
-                    <button class="filter-tab" onclick="filterHistory('cartridge')">
-                        <ion-icon name="filter-outline"></ion-icon> Картридж
-                    </button>
+                <div class="analytics-hero">
+                    <div class="analytics-hero-label">Общие расходы</div>
+                    <div class="analytics-hero-value serif" id="analytics-total">0 ₽</div>
                 </div>
 
+                <div class="analytics-grid">
+                    <div class="analytics-item">
+                        <span class="analytics-label"><ion-icon name="flash-outline"></ion-icon> Электроэнергия</span>
+                        <span class="analytics-value mono" id="analytics-electricity">0 ₽</span>
+                    </div>
+                    <div class="analytics-item">
+                        <span class="analytics-label"><ion-icon name="flame-outline"></ion-icon> Газ</span>
+                        <span class="analytics-value mono" id="analytics-gas">0 ₽</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title"><ion-icon name="stats-chart-outline"></ion-icon> Детальная статистика</h3>
+                <div class="stats-grid">
+                    <div class="stat-item"><div class="stat-label">Средний расход (Эл.)</div><div class="stat-value mono" id="stat-avg-electricity">0 кВт·ч</div></div>
+                    <div class="stat-item"><div class="stat-label">Средний расход (Газ)</div><div class="stat-value mono" id="stat-avg-gas">0 м³</div></div>
+                    <div class="stat-item"><div class="stat-label">Ср. стоимость (Эл.)</div><div class="stat-value mono" id="stat-avg-electricity-cost">0 ₽/кВт·ч</div></div>
+                    <div class="stat-item"><div class="stat-label">Ср. стоимость (Газ)</div><div class="stat-value mono" id="stat-avg-gas-cost">0 ₽/м³</div></div>
+                    <div class="stat-item"><div class="stat-label">Макс. расход (Эл.)</div><div class="stat-value mono" id="stat-max-electricity">0 кВт·ч</div></div>
+                    <div class="stat-item"><div class="stat-label">Мин. расход (Эл.)</div><div class="stat-value mono" id="stat-min-electricity">0 кВт·ч</div></div>
+                    <div class="stat-item"><div class="stat-label">Засыпок соли</div><div class="stat-value mono" id="stat-salt-count">0 раз</div></div>
+                    <div class="stat-item"><div class="stat-label">Замен картриджа</div><div class="stat-value mono" id="stat-cartridge-count">0 раз</div></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title"><ion-icon name="calendar-outline"></ion-icon> Анализ по месяцам</h3>
+                <div id="monthly-breakdown" class="monthly-breakdown"></div>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title"><ion-icon name="git-compare-outline"></ion-icon> Сравнение периодов</h3>
+                <div class="comparison-tabs">
+                    <button class="comparison-tab active" onclick="showComparison('electricity')">Электроэнергия</button>
+                    <button class="comparison-tab" onclick="showComparison('gas')">Газ</button>
+                </div>
+                <div id="comparison-content" class="comparison-content"></div>
+            </div>
+
+            <div class="card">
+                <h3 class="card-title"><ion-icon name="wallet-outline"></ion-icon> Динамика платежей</h3>
+                <div class="payment-stats">
+                    <div class="payment-stat"><div class="payment-label">Всего оплачено</div><div class="payment-value mono" id="payment-total">0 ₽</div></div>
+                    <div class="payment-stat"><div class="payment-label">Средний платеж</div><div class="payment-value mono" id="payment-avg">0 ₽</div></div>
+                    <div class="payment-stat"><div class="payment-label">Количество</div><div class="payment-value mono" id="payment-count">0</div></div>
+                    <div class="payment-stat"><div class="payment-label">Текущий баланс</div><div class="payment-value mono" id="payment-balance">0 ₽</div></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB: HISTORY -->
+        <section id="tab-history" class="tab-content">
+            <div class="section-header">
+                <span class="section-tag">ИСТОРИЯ ПОКАЗАНИЙ</span>
+            </div>
+            <div class="card">
+                <div class="filter-tabs">
+                    <button class="filter-tab active" onclick="filterHistory('all')"><ion-icon name="apps-outline"></ion-icon> Все</button>
+                    <button class="filter-tab" onclick="filterHistory('electricity')"><ion-icon name="flash-outline"></ion-icon> Электричество</button>
+                    <button class="filter-tab" onclick="filterHistory('gas')"><ion-icon name="flame-outline"></ion-icon> Газ</button>
+                    <button class="filter-tab" onclick="filterHistory('salt')"><ion-icon name="snow-outline"></ion-icon> Соль</button>
+                    <button class="filter-tab" onclick="filterHistory('cartridge')"><ion-icon name="water-outline"></ion-icon> Картридж</button>
+                </div>
                 <div id="history-list" class="history-list"></div>
             </div>
-        </div>
+        </section>
 
-        <!-- Вкладка: Тарифы -->
-        <div id="tab-tariffs" class="tab-content">
-            <div class="card">
-                <h2>
-                    <ion-icon name="pricetag-outline" class="section-icon"></ion-icon>
-                    Управление тарифами
-                </h2>
-                
-                <div class="tariff-info">
-                    <ion-icon name="information-circle-outline"></ion-icon>
-                    Тарифы применяются с указанной даты.
-                </div>
-                
-                <!-- Переключатель типа тарифа -->
-                <div class="tariff-type-selector">
-                    <button class="tariff-type-btn active" onclick="showTariffType('electricity', this)">
-                        <ion-icon name="flash-outline"></ion-icon>
-                        <span>Электроэнергия</span>
-                    </button>
-                    <button class="tariff-type-btn" onclick="showTariffType('gas', this)">
-                        <ion-icon name="flame-outline"></ion-icon>
-                        <span>Газ</span>
-                    </button>
-                </div>
-                                <!-- Форма: Тарифы на электричество -->
-<div id="tariff-electricity" class="tariff-form-section active">
-    <form id="tariff-form-electricity" class="tariff-form">
-        <div class="form-row">
-            <div class="form-group">
-                <label>
-                    <ion-icon name="calendar-outline" class="form-icon"></ion-icon>
-                    Дата вступления в силу *
-                </label>
-                <input type="date" id="tariff-elec-date" required>
-            </div>
-        </div>
+        <!-- TAB: TARIFFS -->
+<section id="tab-tariffs" class="tab-content">
+    <div class="section-header">
+        <span class="section-tag">УПРАВЛЕНИЕ ТАРИФАМИ</span>
+    </div>
+    <div class="card">
+        <p class="hint-text" style="margin-top:0; text-align:left; margin-bottom: 24px;">Тарифы применяются с указанной даты. Для электроэнергии действует порог 3000 кВт·ч.</p>
         
-        <div class="form-section" style="background: #f8f9fa; padding: 16px; border-radius: 12px; margin-bottom: 16px;">
-            <h4 style="margin: 0 0 12px 0; font-size: 15px; color: var(--ios-text-secondary);">
-                <ion-icon name="flash-outline" style="color: var(--ios-warning);"></ion-icon>
-                Обычные тарифы
-            </h4>
-            
-            <div class="form-row two-columns">
-                <div class="form-group">
-                    <label>
-                        <ion-icon name="sunny-outline" class="form-icon t1-icon"></ion-icon>
-                        Т1 (день) ₽/кВт·ч
-                    </label>
-                    <input type="number" id="tariff-t1" step="0.01" min="0" required>
-                </div>
-                <div class="form-group">
-                    <label>
-                        <ion-icon name="moon-outline" class="form-icon t2-icon"></ion-icon>
-                        Т2 (ночь) ₽/кВт·ч
-                    </label>
-                    <input type="number" id="tariff-t2" step="0.01" min="0" required>
-                </div>
-            </div>
-        </div>
-        
-        <div class="form-section" style="background: #fff3cd; padding: 16px; border-radius: 12px; margin-bottom: 16px; border-left: 4px solid var(--ios-warning);">
-            <h4 style="margin: 0 0 12px 0; font-size: 15px; color: var(--ios-text-secondary);">
-                <ion-icon name="trending-up-outline" style="color: var(--ios-danger);"></ion-icon>
-                Повышенные тарифы (при расходе >3000 кВт·ч)
-            </h4>
-            <p style="font-size: 13px; color: var(--ios-text-tertiary); margin-bottom: 12px;">
-                Применяются к части расхода сверх 3000 кВт·ч
-            </p>
-            
-            <div class="form-row two-columns">
-                <div class="form-group">
-                    <label>
-                        <ion-icon name="sunny-outline" class="form-icon t1-icon"></ion-icon>
-                        Т1 повышенный ₽/кВт·ч
-                    </label>
-                    <input type="number" id="tariff-over-t1" step="0.01" min="0" placeholder="Например: 4.49">
-                </div>
-                <div class="form-group">
-                    <label>
-                        <ion-icon name="moon-outline" class="form-icon t2-icon"></ion-icon>
-                        Т2 повышенный ₽/кВт·ч
-                    </label>
-                    <input type="number" id="tariff-over-t2" step="0.01" min="0" placeholder="Например: 2.76">
-                </div>
-            </div>
-            
-            <button type="button" class="btn btn-secondary" onclick="autoFillOverTariffs()" style="margin-top: 8px; width: 100%; font-size: 13px;">
-                <ion-icon name="copy-outline"></ion-icon>
-                Автозаполнить (+0.01 к обычным)
+        <div class="tariff-type-selector">
+            <button class="tariff-type-btn active" onclick="showTariffType('electricity', this)">
+                <ion-icon name="flash-outline"></ion-icon>
+                <span>Электроэнергия</span>
+            </button>
+            <button class="tariff-type-btn" onclick="showTariffType('gas', this)">
+                <ion-icon name="flame-outline"></ion-icon>
+                <span>Газ</span>
             </button>
         </div>
-        
-        <button type="submit" class="btn btn-success">
-            <ion-icon name="add-circle-outline" class="btn-icon"></ion-icon>
-            Добавить тариф на электричество
-        </button>
-    </form>
-</div>
-                        
-                        
-                
-                <!-- Форма: Тарифы на газ -->
-                <div id="tariff-gas" class="tariff-form-section">
-                    <form id="tariff-form-gas" class="tariff-form">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>
-                                    <ion-icon name="calendar-outline" class="form-icon"></ion-icon>
-                                    Дата вступления в силу *
-                                </label>
-                                <input type="date" id="tariff-gas-date" required>
-                            </div>
-                        </div>
-                                                <div class="form-row">
-                            <div class="form-group">
-                                <label>
-                                    <ion-icon name="flame-outline" class="form-icon"></ion-icon>
-                                    Газ ₽/м³
-                                </label>
-                                <input type="number" id="tariff-gas-value" step="0.01" min="0" required>
-                            </div>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-success">
-                            <ion-icon name="add-circle-outline" class="btn-icon"></ion-icon>
-                            Добавить тариф на газ
-                        </button>
-                    </form>
-                </div>
 
-                <div class="tariff-actions-panel">
-                    <h3>
-                        <ion-icon name="sync-outline" class="section-icon"></ion-icon>
-                        Массовые действия
-                    </h3>
-                    <button class="btn btn-secondary" onclick="recalculateAll()">
-                        <ion-icon name="calculator-outline" class="btn-icon"></ion-icon>
-                        Пересчитать все записи по актуальным тарифам
-                    </button>
+        <!-- Форма для электричества -->
+        <div id="tariff-electricity" class="tariff-form-section active">
+            <form id="tariff-form-electricity" class="tariff-form">
+                <div class="form-group">
+                    <label>Дата вступления в силу</label>
+                    <input type="date" id="tariff-elec-date" required>
                 </div>
-
-                <div class="tariffs-history">
-    <h3>
-        <ion-icon name="time-outline" class="section-icon"></ion-icon>
-        История тарифов
-    </h3>
-    
-    <!-- Электроэнергия -->
-    <div class="tariff-section-header electricity">
-        <ion-icon name="flash-outline"></ion-icon>
-        <span>Электроэнергия</span>
-    </div>
-    <div id="tariffs-list-electricity" class="tariffs-list"></div>
-    
-    <!-- Газ -->
-    <div class="tariff-section-header gas">
-        <ion-icon name="flame-outline"></ion-icon>
-        <span>Газ</span>
-    </div>
-    <div id="tariffs-list-gas" class="tariffs-list"></div>
-</div>
-            </div>
-        </div>
-
-        <!-- Вкладка: Ещё -->        <div id="tab-more" class="tab-content">
-            <div class="card">
-                <h2>
-                    <ion-icon name="folder-open-outline" class="section-icon"></ion-icon>
-                    Управление данными
-                </h2>
-                
-                <div class="sync-status" id="sync-status">
-                    <ion-icon name="cloud-offline-outline"></ion-icon>
-                    <span>Локальное хранение</span>
-                </div>
-                
-                <div class="form-actions stacked">
-                    <button class="btn btn-success" onclick="exportData()">
-                        <ion-icon name="cloud-download-outline" class="btn-icon"></ion-icon>
-                        Экспорт данных (JSON)
-                    </button>
-                    
-                    <div class="import-wrapper">
-                        <button class="btn btn-secondary" id="import-trigger-btn">
-                            <ion-icon name="cloud-upload-outline" class="btn-icon"></ion-icon>
-                            Импорт данных
-                        </button>
-                        <input type="file" id="import-file" accept=".json" onchange="importData(event)">
+                <h4 class="form-subtitle">Обычные тарифы</h4>
+                <div class="form-row two-columns">
+                    <div class="form-group">
+                        <label>Т1 (День)</label>
+                        <input type="number" id="tariff-t1" step="0.01" required oninput="autoFillOverTariffs()">
                     </div>
-                    
-                    <button class="btn btn-danger" onclick="resetAllData()">
-                        <ion-icon name="trash-outline" class="btn-icon"></ion-icon>
-                        Полный сброс данных
-                    </button>
+                    <div class="form-group">
+                        <label>Т2 (Ночь)</label>
+                        <input type="number" id="tariff-t2" step="0.01" required oninput="autoFillOverTariffs()">
+                    </div>
                 </div>
-                
-                <p class="hint-text">
-                    При сбросе удаляются локальные данные. Данные в Firebase сохраняются.
-                </p>
-            </div>
+                <h4 class="form-subtitle">Повышенные (сверх 3000 кВт·ч)</h4>
+                <div class="form-row two-columns">
+                    <div class="form-group">
+                        <label>Т1 повышенный</label>
+                        <input type="number" id="tariff-over-t1" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>Т2 повышенный</label>
+                        <input type="number" id="tariff-over-t2" step="0.01">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width:100%; margin-top:24px;">
+                    <ion-icon name="add-outline"></ion-icon>
+                    Добавить тариф
+                </button>
+            </form>
         </div>
+
+        <!-- Форма для газа -->
+        <div id="tariff-gas" class="tariff-form-section">
+            <form id="tariff-form-gas" class="tariff-form">
+                <div class="form-group">
+                    <label>Дата вступления в силу</label>
+                    <input type="date" id="tariff-gas-date" required>
+                </div>
+                <div class="form-group">
+                    <label>Тариф (₽/м³)</label>
+                    <input type="number" id="tariff-gas-value" step="0.01" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width:100%; margin-top:24px;">
+                    <ion-icon name="add-outline"></ion-icon>
+                    Добавить тариф
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="tariff-actions-panel">
+            <h3 class="card-title">Массовые действия</h3>
+            <button class="btn btn-secondary" onclick="recalculateAll()" style="width:100%;">
+                <ion-icon name="calculator-outline"></ion-icon>
+                Пересчитать все записи
+            </button>
+        </div>
+        <div class="tariffs-history">
+            <h3 class="card-title">История тарифов</h3>
+            <div id="tariffs-list-electricity" class="tariffs-list"></div>
+            <div id="tariffs-list-gas" class="tariffs-list" style="margin-top: 32px;"></div>
+        </div>
+    </div>
+</section>
+
+        <!-- TAB: MORE -->
+        <section id="tab-more" class="tab-content">
+            <div class="section-header">
+                <span class="section-tag">УПРАВЛЕНИЕ ДАННЫМИ</span>
+            </div>
+            <div class="card">
+                <div class="form-actions stacked">
+                    <button class="btn btn-secondary" onclick="exportData()"><ion-icon name="download-outline"></ion-icon> Экспорт данных (JSON)</button>
+                    <div class="import-wrapper">
+                        <button class="btn btn-secondary"><ion-icon name="upload-outline"></ion-icon> Импорт данных</button>
+                        <input type="file" accept=".json" onchange="importData(event)">
+                    </div>
+                    <button class="btn btn-danger" onclick="resetAllData()"><ion-icon name="trash-outline"></ion-icon> Полный сброс данных</button>
+                </div>
+                <p class="hint-text">При сбросе удаляются локальные данные. Данные в Firebase сохраняются.</p>
+            </div>
+        </section>
     </main>
 
-    <!-- Плавающее перетаскиваемое меню -->
-<nav class="floating-nav" id="floating-nav">
-    <button class="nav-btn active" onclick="switchTab('input', this)">
-        <ion-icon name="create-outline"></ion-icon>
-        <span>Ввод</span>
-    </button>
-    <button class="nav-btn" onclick="switchTab('payments', this)">
-        <ion-icon name="cash-outline"></ion-icon>
-        <span>Оплаты</span>
-    </button>
-    <button class="nav-btn" onclick="switchTab('analytics', this)">
-        <ion-icon name="stats-chart-outline"></ion-icon>
-        <span>Аналитика</span>
-    </button>
-    <button class="nav-btn" onclick="switchTab('history', this)">
-        <ion-icon name="time-outline"></ion-icon>
-        <span>История</span>
-    </button>
-    <button class="nav-btn" onclick="switchTab('tariffs', this)">
-        <ion-icon name="pricetag-outline"></ion-icon>
-        <span>Тарифы</span>
-    </button>
-    <button class="nav-btn" onclick="switchTab('more', this)">
-        <ion-icon name="ellipsis-horizontal-outline"></ion-icon>
-        <span>Ещё</span>
-    </button>
-</nav>
-    
-    <!-- Модальное окно редактирования -->
-<div id="edit-modal" class="modal-overlay">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3 id="modal-title">
-                <ion-icon name="create-outline"></ion-icon>
-                Редактирование записи
-            </h3>
-            <button class="modal-close" onclick="closeEditModal()">
-                <ion-icon name="close-outline"></ion-icon>
-            </button>
-        </div>
-        
-        <div class="modal-body" id="modal-body">
-            <!-- Содержимое формы редактирования -->
-        </div>
-        
-        <div class="modal-footer">
-            <button class="btn btn-secondary" onclick="closeEditModal()">
-                <ion-icon name="close-outline"></ion-icon>
-                Отмена
-            </button>
-            <button class="btn btn-success" onclick="saveEditedRecord()">
-                <ion-icon name="save-outline"></ion-icon>
-                Сохранить
-            </button>
-        </div>
-    </div>
-</div>
+    <!-- FLOATING NAV -->
+    <nav class="floating-nav">
+        <button class="nav-btn active" onclick="switchTab('input', this)"><ion-icon name="create-outline"></ion-icon><span>Ввод</span></button>
+        <button class="nav-btn" onclick="switchTab('payments', this)"><ion-icon name="wallet-outline"></ion-icon><span>Оплаты</span></button>
+        <button class="nav-btn" onclick="switchTab('analytics', this)"><ion-icon name="pie-chart-outline"></ion-icon><span>Аналитика</span></button>
+        <button class="nav-btn" onclick="switchTab('history', this)"><ion-icon name="time-outline"></ion-icon><span>История</span></button>
+        <button class="nav-btn" onclick="switchTab('tariffs', this)"><ion-icon name="pricetag-outline"></ion-icon><span>Тарифы</span></button>
+        <button class="nav-btn" onclick="switchTab('more', this)"><ion-icon name="ellipsis-horizontal-outline"></ion-icon><span>Ещё</span></button>
+    </nav>
 
-<!-- Модальное окно редактирования тарифа -->
-<div id="edit-tariff-modal" class="modal-overlay">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3 id="edit-tariff-title">
-                <ion-icon name="create-outline"></ion-icon>
-                Редактирование тарифа
-            </h3>
-            <button class="modal-close" onclick="closeEditTariffModal()">
-                <ion-icon name="close-outline"></ion-icon>
-            </button>
-        </div>
-        
-        <div class="modal-body" id="edit-tariff-body">
-            <div class="form-row">
-                <div class="form-group">
-                    <label>
-                        <ion-icon name="calendar-outline" class="form-icon"></ion-icon>
-                        Дата вступления в силу *
-                    </label>
-                    <input type="date" id="edit-tariff-date" required>
-                </div>
+    <!-- MODALS -->
+    <div id="edit-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title"><ion-icon name="create-outline"></ion-icon> Редактирование</h3>
+                <button class="modal-close" onclick="closeEditModal()"><ion-icon name="close-outline"></ion-icon></button>
             </div>
-            
-            <div class="form-section" style="background: #f8f9fa; padding: 16px; border-radius: 12px; margin-bottom: 16px;">
-                <h4 style="margin: 0 0 12px 0; font-size: 15px; color: var(--ios-text-secondary);">
-                    <ion-icon name="flash-outline" style="color: var(--ios-warning);"></ion-icon>
-                    Обычные тарифы
-                </h4>
-                
-                <div class="form-row two-columns">
-                    <div class="form-group">
-                        <label>
-                            <ion-icon name="sunny-outline" class="form-icon t1-icon"></ion-icon>
-                            Т1 (день) ₽/кВт·ч
-                        </label>
-                        <input type="number" id="edit-tariff-t1" step="0.01" min="0" required>
-                    </div>
-                    <div class="form-group">
-                        <label>
-                            <ion-icon name="moon-outline" class="form-icon t2-icon"></ion-icon>
-                            Т2 (ночь) ₽/кВт·ч
-                        </label>
-                        <input type="number" id="edit-tariff-t2" step="0.01" min="0" required>
-                    </div>
-                </div>
+            <div class="modal-body" id="modal-body"></div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="closeEditModal()">Отмена</button>
+                <button class="btn btn-primary" onclick="saveEditedRecord()">Сохранить</button>
             </div>
-            
-            <div class="form-section" style="background: #fff3cd; padding: 16px; border-radius: 12px; margin-bottom: 16px; border-left: 4px solid var(--ios-warning);">
-                <h4 style="margin: 0 0 12px 0; font-size: 15px; color: var(--ios-text-secondary);">
-                    <ion-icon name="trending-up-outline" style="color: var(--ios-danger);"></ion-icon>
-                    Повышенные тарифы (сверх 3000 кВт·ч)
-                </h4>
-                
-                <div class="form-row two-columns">
-                    <div class="form-group">
-                        <label>
-                            <ion-icon name="sunny-outline" class="form-icon t1-icon"></ion-icon>
-                            Т1 повышенный ₽/кВт·ч
-                        </label>
-                        <input type="number" id="edit-tariff-over-t1" step="0.01" min="0">
-                    </div>
-                    <div class="form-group">
-                        <label>
-                            <ion-icon name="moon-outline" class="form-icon t2-icon"></ion-icon>
-                            Т2 повышенный ₽/кВт·ч
-                        </label>
-                        <input type="number" id="edit-tariff-over-t2" step="0.01" min="0">
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="modal-footer">
-            <button class="btn btn-secondary" onclick="closeEditTariffModal()">
-                <ion-icon name="close-outline"></ion-icon>
-                Отмена
-            </button>
-            <button class="btn btn-success" onclick="saveEditedTariff()">
-                <ion-icon name="save-outline"></ion-icon>
-                Сохранить
-            </button>
         </div>
     </div>
-</div>
 
-<!-- Модальное окно редактирования платежа -->
-<div id="edit-payment-modal" class="modal-overlay">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3 id="edit-payment-title">
-                <ion-icon name="create-outline"></ion-icon>
-                Редактирование платежа
-            </h3>
-            <button class="modal-close" onclick="closeEditPaymentModal()">
-                <ion-icon name="close-outline"></ion-icon>
-            </button>
-        </div>
-        
-        <div class="modal-body">
-            <div class="form-row">
-                <div class="form-group">
-                    <label>
-                        <ion-icon name="calendar-outline" class="form-icon"></ion-icon>
-                        Дата платежа *
-                    </label>
-                    <input type="date" id="edit-payment-date" required>
-                </div>
+    <div id="edit-tariff-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="edit-tariff-title"><ion-icon name="create-outline"></ion-icon> Редактирование тарифа</h3>
+                <button class="modal-close" onclick="closeEditTariffModal()"><ion-icon name="close-outline"></ion-icon></button>
             </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label>
-                        <ion-icon name="cash-outline" class="form-icon"></ion-icon>
-                        Сумма (₽) *
-                    </label>
-                    <input type="number" id="edit-payment-amount" step="0.01" min="0" required>
-                </div>
+            <div class="modal-body">
+                <div class="form-group"><label>Дата</label><input type="date" id="edit-tariff-date"></div>
+                <div class="form-group"><label>Т1 (День)</label><input type="number" id="edit-tariff-t1" step="0.01"></div>
+                <div class="form-group"><label>Т2 (Ночь)</label><input type="number" id="edit-tariff-t2" step="0.01"></div>
+                <div class="form-group"><label>Т1 повышенный</label><input type="number" id="edit-tariff-over-t1" step="0.01"></div>
+                <div class="form-group"><label>Т2 повышенный</label><input type="number" id="edit-tariff-over-t2" step="0.01"></div>
             </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label>
-                        <ion-icon name="flash-outline" class="form-icon"></ion-icon>
-                        Тип платежа
-                    </label>
-                    <input type="text" id="edit-payment-type-display" disabled style="background: #f8f9fa;">
-                </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="closeEditTariffModal()">Отмена</button>
+                <button class="btn btn-primary" onclick="saveEditedTariff()">Сохранить</button>
             </div>
-        </div>
-        
-        <div class="modal-footer">
-            <button class="btn btn-secondary" onclick="closeEditPaymentModal()">
-                <ion-icon name="close-outline"></ion-icon>
-                Отмена
-            </button>
-            <button class="btn btn-success" onclick="saveEditedPayment()">
-                <ion-icon name="save-outline"></ion-icon>
-                Сохранить
-            </button>
         </div>
     </div>
-</div>
-    
+
+    <div id="edit-payment-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="edit-payment-title"><ion-icon name="create-outline"></ion-icon> Редактирование платежа</h3>
+                <button class="modal-close" onclick="closeEditPaymentModal()"><ion-icon name="close-outline"></ion-icon></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group"><label>Дата</label><input type="date" id="edit-payment-date"></div>
+                <div class="form-group"><label>Сумма (₽)</label><input type="number" id="edit-payment-amount" step="0.01"></div>
+                <div class="form-group"><label>Тип</label><input type="text" id="edit-payment-type-display" disabled></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="closeEditPaymentModal()">Отмена</button>
+                <button class="btn btn-primary" onclick="saveEditedPayment()">Сохранить</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="script.js?v=1.2.0"></script>
 </body>
 </html>

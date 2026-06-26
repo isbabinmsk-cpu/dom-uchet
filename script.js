@@ -422,9 +422,39 @@ function showInputType(type, btn) {
 // ===== ПЕРЕКЛЮЧЕНИЕ ТИПА ТАРИФА =====
 function showTariffType(type, btn) {
     currentTariffType = type;
-    document.querySelectorAll('.tariff-form-section').forEach(section => section.classList.remove('active'));    document.querySelectorAll('.tariff-type-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById(`tariff-${type}`).classList.add('active');
-    if (btn) btn.classList.add('active');
+    
+    // Скрываем все формы ввода тарифов
+    document.querySelectorAll('.tariff-form-section').forEach(section => {
+        section.classList.remove('active');
+    });
+    
+    // Скрываем все списки истории тарифов
+    document.querySelectorAll('.tariffs-list').forEach(list => {
+        list.classList.remove('active');
+    });
+    
+    // Убираем активный класс у всех кнопок
+    document.querySelectorAll('.tariff-type-btn').forEach(b => {
+        b.classList.remove('active');
+    });
+    
+    // Показываем выбранную форму
+    const formSection = document.getElementById(`tariff-${type}`);
+    if (formSection) {
+        formSection.classList.add('active');
+    }
+    
+    // Показываем соответствующий список истории
+    const historyList = document.getElementById(`tariffs-list-${type}`);
+    if (historyList) {
+        historyList.classList.add('active');
+    }
+    
+    // Делаем кнопку активной
+    if (btn) {
+        btn.classList.add('active');
+    }
+    
     initDates();
 }
 
@@ -776,7 +806,7 @@ function updateTariffList() {
             }).join('');
         }
     }
-    
+
     // Обновляем список тарифов на газ
     const gasList = document.getElementById('tariffs-list-gas');
     if (gasList) {
@@ -826,6 +856,18 @@ function updateTariffList() {
                 `;
             }).join('');
         }
+    }
+
+    // Управляем видимостью списков в зависимости от выбранного типа
+    const elecListEl = document.getElementById('tariffs-list-electricity');
+    const gasListEl = document.getElementById('tariffs-list-gas');
+    
+    if (currentTariffType === 'electricity') {
+        if (elecListEl) elecListEl.classList.add('active');
+        if (gasListEl) gasListEl.classList.remove('active');
+    } else if (currentTariffType === 'gas') {
+        if (elecListEl) elecListEl.classList.remove('active');
+        if (gasListEl) gasListEl.classList.add('active');
     }
 }
 
@@ -2289,6 +2331,8 @@ function initDraggableNav() {
     let dragStartTime = 0;
     let hasMoved = false;
     let clickedButton = null;
+    let lastTapTime = 0;
+    const DOUBLE_TAP_DELAY = 300; // мс для двойного тапа
 
     // Загружаем сохраненную позицию
     const savedPos = localStorage.getItem('nav_position');
@@ -2302,13 +2346,59 @@ function initDraggableNav() {
         currentY = pos.y;
     }
 
+    // ===== ФУНКЦИЯ ВОЗВРАТА МЕНЮ НА МЕСТО =====
+    function resetNavPosition() {
+        nav.style.transition = 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
+        nav.style.left = '50%';
+        nav.style.bottom = '24px';
+        nav.style.top = 'auto';
+        nav.style.transform = 'translateX(-50%)';
+        
+        localStorage.removeItem('nav_position');
+        
+        setTimeout(() => {
+            nav.style.transition = '';
+            // Обновляем текущие координаты
+            const rect = nav.getBoundingClientRect();
+            currentX = rect.left;
+            currentY = rect.top;
+        }, 500);
+    }
+
+    // ===== ОБРАБОТКА ДВОЙНОГО ТАПА/КЛИКА =====
+    function handleDoubleTap(e) {
+        const currentTime = new Date().getTime();
+        const tapLength = currentTime - lastTapTime;
+        
+        // Проверяем, что это не клик по кнопке
+        if (e.target.closest('.nav-btn')) return;
+        
+        if (tapLength < DOUBLE_TAP_DELAY && tapLength > 0) {
+            // Это двойной тап
+            e.preventDefault();
+            resetNavPosition();
+            lastTapTime = 0; // Сбрасываем чтобы не сработал третий раз
+        } else {
+            lastTapTime = currentTime;
+        }
+    }
+
     // ===== МЫШЬ =====
     nav.addEventListener('mousedown', dragStart);
     document.addEventListener('mousemove', dragMove);
     document.addEventListener('mouseup', dragEnd);
+    nav.addEventListener('dblclick', (e) => {
+        if (!e.target.closest('.nav-btn')) {
+            resetNavPosition();
+        }
+    });
 
     // ===== ТАЧ (мобильные) =====
-    nav.addEventListener('touchstart', dragStart, { passive: false });
+    nav.addEventListener('touchstart', (e) => {
+        dragStart(e);
+        handleDoubleTap(e);
+    }, { passive: false });
+    
     document.addEventListener('touchmove', dragMove, { passive: false });
     document.addEventListener('touchend', dragEnd);
 
@@ -2403,24 +2493,12 @@ function initDraggableNav() {
         
         clickedButton = null;
     }
-
-    // Двойной клик - вернуть меню в центр внизу
-    nav.addEventListener('dblclick', (e) => {
-        if (e.target.closest('.nav-btn')) return;
-        
-        nav.style.transition = 'all 0.5s ease';
-        nav.style.left = '50%';
-        nav.style.bottom = '20px';
-        nav.style.top = 'auto';
-        nav.style.transform = 'translateX(-50%)';
-        
-        localStorage.removeItem('nav_position');
-        
-        setTimeout(() => {
-            nav.style.transition = '';
-        }, 500);
-    });
 }
+
+// Запускаем после загрузки DOM
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(initDraggableNav, 100);
+});
 
 // Запускаем после загрузки DOM
 document.addEventListener('DOMContentLoaded', () => {
