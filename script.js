@@ -1480,33 +1480,88 @@ function filterHistory(type) {
     updateHistory();
 }
 
+// ===== ВСПОМОГАТЕЛЬНАЯ ФУНКЦИЯ ДЛЯ РАСЧЕТА ДНЕЙ МЕЖДУ ЗАСЫПКАМИ СОЛИ =====
+function getDaysSinceLastSalt(currentDate, currentId) {
+    const saltRecords = records
+        .filter(r => r.type === 'salt' && r.id !== currentId)
+        .sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+    const lastRecord = saltRecords.find(r => r.date < currentDate);
+    
+    if (lastRecord) {
+        const current = new Date(currentDate);
+        const last = new Date(lastRecord.date);
+        const diffTime = Math.abs(current - last);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        return diffDays;
+    }
+    
+    return null; // Первая запись
+}
+
+// Функция для правильного склонения слов
+function getDaysWord(days) {
+    if (days === 1) return 'день';
+    if (days >= 2 && days <= 4) return 'дня';
+    if (days >= 5 && days <= 20) return 'дней';
+    if (days >= 21 && days <= 24) return 'дня';
+    if (days >= 25 && days <= 30) return 'дней';
+    if (days % 10 === 1) return 'день';
+    if (days % 10 >= 2 && days % 10 <= 4) return 'дня';
+    return 'дней';
+}
+
 function updateHistory() {
     const list = document.getElementById('history-list');
-    if (!list) return;    let filtered = [...records];
-    if (currentFilter !== 'all') filtered = filtered.filter(r => r.type === currentFilter);
+    if (!list) return;
+    
+    let filtered = [...records];
+    if (currentFilter !== 'all') {
+        filtered = filtered.filter(r => r.type === currentFilter);
+    }
     filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
-
+    
     if (filtered.length === 0) {
         list.innerHTML = '<p class="hint-text">Нет записей</p>';
         return;
     }
-
+    
     list.innerHTML = filtered.map(r => {
         let content = '';
+        
         if (r.type === 'electricity') {
             content = `<div class="history-header"><span class="history-date"><ion-icon name="flash-outline" style="color: var(--ios-warning);"></ion-icon>${formatDate(r.date)}</span><span class="history-type">Электроэнергия</span></div>
-                <div class="history-values"><div><ion-icon name="sunny-outline" style="color: var(--ios-warning);"></ion-icon>Т1: ${r.t1} кВт·ч</div><div><ion-icon name="moon-outline" style="color: var(--ios-accent);"></ion-icon>Т2: ${r.t2} кВт·ч</div><div>Расход Т1: ${r.consumptionT1.toFixed(2)} кВт·ч</div><div>Расход Т2: ${r.consumptionT2.toFixed(2)} кВт·ч</div></div>
-                <div class="history-total">Итого: ${r.total.toFixed(2)} ₽</div>`;
+                 <div class="history-values"><div><ion-icon name="sunny-outline" style="color: var(--ios-warning);"></ion-icon>Т1: ${r.t1} кВт·ч</div><div><ion-icon name="moon-outline" style="color: var(--ios-accent);"></ion-icon>Т2: ${r.t2} кВт·ч</div><div>Расход Т1: ${r.consumptionT1.toFixed(2)} кВт·ч</div><div>Расход Т2: ${r.consumptionT2.toFixed(2)} кВт·ч</div></div>
+                 <div class="history-total">Итого: ${r.total.toFixed(2)} ₽</div>`;
         } else if (r.type === 'gas') {
             content = `<div class="history-header"><span class="history-date"><ion-icon name="flame-outline" style="color: var(--ios-warning);"></ion-icon>${formatDate(r.date)}</span><span class="history-type">Газ</span></div>
-                <div class="history-values"><div><ion-icon name="speedometer-outline"></ion-icon>Показание: ${r.reading} м³</div><div>Расход: ${r.consumption.toFixed(2)} м³</div><div>Тариф: ${r.tariff.value} ₽/м³</div></div>
-                <div class="history-total">Итого: ${r.total.toFixed(2)} ₽</div>`;
+                 <div class="history-values"><div><ion-icon name="speedometer-outline"></ion-icon>Показание: ${r.reading} м³</div><div>Расход: ${r.consumption.toFixed(2)} м³</div><div>Тариф: ${r.tariff.value} ₽/м³</div></div>
+                 <div class="history-total">Итого: ${r.total.toFixed(2)} ₽</div>`;
         } else if (r.type === 'salt') {
+            // Рассчитываем дни с предыдущей засыпки
+            const daysSinceLast = getDaysSinceLastSalt(r.date, r.id);
+            let daysInfo = '';
+            
+            if (daysSinceLast !== null) {
+                const daysWord = getDaysWord(daysSinceLast);
+                daysInfo = `<div class="salt-interval">
+                    <ion-icon name="time-outline" style="color: var(--ios-accent);"></ion-icon>
+                    Прошло: <strong>${daysSinceLast} ${daysWord}</strong> с предыдущей засыпки
+                </div>`;
+            } else {
+                daysInfo = `<div class="salt-interval first-record">
+                    <ion-icon name="checkmark-circle-outline" style="color: var(--ios-success);"></ion-icon>
+                    Первая запись
+                </div>`;
+            }
+            
             content = `<div class="history-header"><span class="history-date"><ion-icon name="snow-outline" style="color: var(--ios-text-secondary);"></ion-icon>${formatDate(r.date)}</span><span class="history-type">Засыпка соли</span></div>
-                <div class="history-values"><div><ion-icon name="scale-outline"></ion-icon>Количество: ${r.kg} кг</div></div>`;
+                 <div class="history-values"><div><ion-icon name="scale-outline"></ion-icon>Количество: ${r.kg} кг</div></div>
+                 ${daysInfo}`;
         } else if (r.type === 'cartridge') {
             content = `<div class="history-header"><span class="history-date"><ion-icon name="filter-outline" style="color: var(--ios-success);"></ion-icon>${formatDate(r.date)}</span><span class="history-type">Замена картриджа</span></div>`;
         }
+        
         return `<div class="history-item ${r.type}">${content}<div class="history-actions"><button class="btn btn-secondary" onclick="editRecord('${r.id}')"><ion-icon name="create-outline"></ion-icon>Редактировать</button><button class="btn btn-danger" onclick="deleteRecord('${r.id}')"><ion-icon name="trash-outline"></ion-icon>Удалить</button></div></div>`;
     }).join('');
 }
@@ -2111,6 +2166,7 @@ function updateComparison(type = 'electricity') {
 }
 
 
+
 // ===== УТИЛИТЫ =====
 function formatDate(dateStr) {
     if (!dateStr) return '';
@@ -2537,3 +2593,5 @@ window.closeEditPaymentModal = closeEditPaymentModal;
 window.saveEditedPayment = saveEditedPayment;
 window.showComparison = showComparison;
 window.updateComparison = updateComparison;
+window.getDaysSinceLastSalt = getDaysSinceLastSalt;
+window.getDaysWord = getDaysWord;

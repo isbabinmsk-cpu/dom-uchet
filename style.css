@@ -750,3 +750,55 @@ select {
     flex-direction: column;
     gap: 12px;
 }
+
+/* ===== ИНТЕРВАЛ ЗАСЫПКИ СОЛИ ===== */
+.salt-interval {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: rgba(0, 122, 255, 0.08);
+    border-radius: 9px;
+    font-size: 14px;
+    margin-top: 10px;
+    border: 1.5px solid var(--ios-border);
+    color: var(--ios-text-secondary);
+    width: 100%;
+    box-sizing: border-box;
+    flex-wrap: wrap;
+}
+
+.salt-interval ion-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.salt-interval strong {
+    font-weight: 700;
+    color: var(--ios-accent);
+}
+
+.salt-interval.first-record {
+    background: rgba(52, 199, 89, 0.08);
+    border-color: rgba(52, 199, 89, 0.3);
+}
+
+.salt-interval.first-record ion-icon {
+    color: var(--ios-success);
+}
+
+.salt-interval.first-record strong {
+    color: var(--ios-success);
+}
+
+/* Адаптивность */
+@media (max-width: 480px) {
+    .salt-interval {
+        font-size: 13px;
+        padding: 8px 12px;
+    }
+    
+    .salt-interval ion-icon {
+        font-size: 16px;
+    }
+}
